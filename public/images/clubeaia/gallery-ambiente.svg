@@ -1,0 +1,15 @@
+<svg width="900" height="900" viewBox="0 0 900 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="900" height="900" fill="#173554"/>
+<rect width="900" height="900" fill="url(#paint0_linear_ambiente)"/>
+<circle cx="702" cy="168" r="166" fill="#E3C78F" fill-opacity="0.2"/>
+<rect x="94" y="104" width="712" height="522" rx="38" fill="white" fill-opacity="0.08"/>
+<rect x="142" y="154" width="616" height="326" rx="30" fill="#D7E3ED" fill-opacity="0.18"/>
+<path d="M112 672C208 616 316 588 438 588C598 588 691 677 806 677V796H112V672Z" fill="#0E253A" fill-opacity="0.7"/>
+<text x="112" y="778" fill="white" fill-opacity="0.9" font-family="Manrope, Arial, sans-serif" font-size="38" font-weight="700">Ambiente social</text>
+<defs>
+<linearGradient id="paint0_linear_ambiente" x1="900" y1="900" x2="70" y2="78" gradientUnits="userSpaceOnUse">
+<stop stop-color="#0E2438"/>
+<stop offset="1" stop-color="#285377"/>
+</linearGradient>
+</defs>
+</svg>

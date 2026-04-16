@@ -1,0 +1,15 @@
+<svg width="900" height="700" viewBox="0 0 900 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="900" height="700" fill="#1A4E72"/>
+<rect width="900" height="700" fill="url(#paint0_linear_piscina)"/>
+<rect x="104" y="122" width="692" height="324" rx="40" fill="#88C9E8"/>
+<path d="M130 210C200 186 274 174 352 174C460 174 532 214 624 214C690 214 748 194 786 176V286H130V210Z" fill="white" fill-opacity="0.16"/>
+<path d="M128 330C196 308 266 296 338 296C444 296 518 336 622 336C690 336 746 318 786 304V412H128V330Z" fill="white" fill-opacity="0.14"/>
+<rect x="0" y="520" width="900" height="180" fill="#10304A" fill-opacity="0.5"/>
+<text x="98" y="610" fill="white" fill-opacity="0.92" font-family="Manrope, Arial, sans-serif" font-size="34" font-weight="700">Piscina e lazer</text>
+<defs>
+<linearGradient id="paint0_linear_piscina" x1="900" y1="700" x2="70" y2="70" gradientUnits="userSpaceOnUse">
+<stop stop-color="#10304A"/>
+<stop offset="1" stop-color="#3678A1"/>
+</linearGradient>
+</defs>
+</svg>

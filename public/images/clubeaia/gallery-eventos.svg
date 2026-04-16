@@ -1,0 +1,18 @@
+<svg width="900" height="700" viewBox="0 0 900 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="900" height="700" fill="#542B32"/>
+<rect width="900" height="700" fill="url(#paint0_linear_eventos)"/>
+<circle cx="206" cy="166" r="42" fill="#F3E4C8" fill-opacity="0.72"/>
+<circle cx="332" cy="166" r="42" fill="#F3E4C8" fill-opacity="0.52"/>
+<circle cx="458" cy="166" r="42" fill="#F3E4C8" fill-opacity="0.72"/>
+<circle cx="584" cy="166" r="42" fill="#F3E4C8" fill-opacity="0.52"/>
+<circle cx="710" cy="166" r="42" fill="#F3E4C8" fill-opacity="0.72"/>
+<rect x="114" y="274" width="672" height="228" rx="38" fill="white" fill-opacity="0.08"/>
+<path d="M0 560H900V700H0V560Z" fill="#261218" fill-opacity="0.48"/>
+<text x="96" y="632" fill="white" fill-opacity="0.92" font-family="Manrope, Arial, sans-serif" font-size="34" font-weight="700">Eventos e encontros</text>
+<defs>
+<linearGradient id="paint0_linear_eventos" x1="900" y1="700" x2="56" y2="54" gradientUnits="userSpaceOnUse">
+<stop stop-color="#291219"/>
+<stop offset="1" stop-color="#78424B"/>
+</linearGradient>
+</defs>
+</svg>

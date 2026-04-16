@@ -1,0 +1,18 @@
+<svg width="900" height="700" viewBox="0 0 900 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="900" height="700" fill="#2A2F39"/>
+<rect width="900" height="700" fill="url(#paint0_linear_fitness)"/>
+<rect x="116" y="148" width="668" height="282" rx="36" fill="#444D5E"/>
+<rect x="166" y="214" width="112" height="144" rx="20" fill="#D6DEE8" fill-opacity="0.24"/>
+<rect x="324" y="186" width="252" height="30" rx="15" fill="white" fill-opacity="0.72"/>
+<rect x="324" y="236" width="184" height="18" rx="9" fill="white" fill-opacity="0.3"/>
+<rect x="324" y="278" width="220" height="18" rx="9" fill="white" fill-opacity="0.3"/>
+<rect x="604" y="206" width="120" height="108" rx="54" fill="#E0C38C" fill-opacity="0.28"/>
+<rect x="0" y="548" width="900" height="152" fill="#11151B" fill-opacity="0.52"/>
+<text x="98" y="622" fill="white" fill-opacity="0.92" font-family="Manrope, Arial, sans-serif" font-size="34" font-weight="700">Fitness e bem-estar</text>
+<defs>
+<linearGradient id="paint0_linear_fitness" x1="900" y1="700" x2="72" y2="62" gradientUnits="userSpaceOnUse">
+<stop stop-color="#151A22"/>
+<stop offset="1" stop-color="#505C72"/>
+</linearGradient>
+</defs>
+</svg>

@@ -1,0 +1,26 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="1600" height="900" fill="#10263D"/>
+<rect width="1600" height="900" fill="url(#paint0_linear_hero-banner)"/>
+<circle cx="1338" cy="154" r="223" fill="#E0C38C" fill-opacity="0.18"/>
+<circle cx="1182" cy="672" r="278" fill="#88A9C6" fill-opacity="0.2"/>
+<path d="M0 614C169 548 332 514 490 514C754 514 908 664 1118 664C1274 664 1434 608 1600 480V900H0V614Z" fill="#23496E"/>
+<path d="M0 690C183 604 361 561 534 561C758 561 915 719 1120 719C1298 719 1458 654 1600 565V900H0V690Z" fill="#1A3553"/>
+<rect x="119" y="114" width="462" height="630" rx="42" fill="white" fill-opacity="0.06" stroke="white" stroke-opacity="0.1"/>
+<rect x="157" y="156" width="146" height="146" rx="28" fill="#D6E1EC" fill-opacity="0.2"/>
+<rect x="331" y="156" width="214" height="28" rx="14" fill="white" fill-opacity="0.82"/>
+<rect x="331" y="204" width="170" height="18" rx="9" fill="white" fill-opacity="0.4"/>
+<rect x="157" y="340" width="388" height="16" rx="8" fill="white" fill-opacity="0.4"/>
+<rect x="157" y="374" width="346" height="16" rx="8" fill="white" fill-opacity="0.24"/>
+<rect x="157" y="408" width="292" height="16" rx="8" fill="white" fill-opacity="0.24"/>
+<rect x="157" y="491" width="158" height="90" rx="24" fill="#E0C38C" fill-opacity="0.2"/>
+<rect x="337" y="491" width="208" height="90" rx="24" fill="#D6E1EC" fill-opacity="0.12"/>
+<rect x="157" y="611" width="388" height="95" rx="28" fill="#0F2236" fill-opacity="0.55" stroke="white" stroke-opacity="0.08"/>
+<text x="985" y="756" fill="white" fill-opacity="0.86" font-family="Manrope, Arial, sans-serif" font-size="42" font-weight="700">ClubeAIA</text>
+<text x="985" y="804" fill="white" fill-opacity="0.54" font-family="Manrope, Arial, sans-serif" font-size="20" font-weight="600">Banner visual de entrada</text>
+<defs>
+<linearGradient id="paint0_linear_hero-banner" x1="1600" y1="900" x2="65" y2="116" gradientUnits="userSpaceOnUse">
+<stop stop-color="#0D2032"/>
+<stop offset="1" stop-color="#183B5C"/>
+</linearGradient>
+</defs>
+</svg>

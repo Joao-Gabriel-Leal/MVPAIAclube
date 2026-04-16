@@ -1,0 +1,1192 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --club-ink: 35 43 52;
+        --club-muted: 100 116 139;
+        --club-surface: 255 255 255;
+        --club-surface-soft: 244 241 235;
+        --club-surface-muted: 237 233 225;
+        --club-brand: 23 53 84;
+        --club-brand-strong: 15 39 64;
+        --club-brand-soft: 228 235 243;
+        --club-brand-glow: 204 216 230;
+        --club-accent: 171 141 89;
+        --club-accent-soft: 244 236 220;
+        --club-success: 16 185 129;
+        --club-success-soft: 220 252 231;
+        --club-warning: 245 158 11;
+        --club-warning-soft: 254 243 199;
+        --club-danger: 239 68 68;
+        --club-danger-soft: 254 226 226;
+        --club-info: 59 130 246;
+        --club-info-soft: 219 234 254;
+    }
+
+    html {
+        color-scheme: light;
+        scroll-behavior: smooth;
+    }
+
+    body {
+        @apply min-h-screen text-slate-900 antialiased;
+        background-color: rgb(var(--club-surface-soft));
+        background-image:
+            radial-gradient(circle at 0% 0%, rgba(214, 223, 232, 0.7), transparent 24%),
+            radial-gradient(circle at 100% 0%, rgba(233, 224, 204, 0.45), transparent 20%),
+            radial-gradient(circle at 50% 100%, rgba(210, 218, 225, 0.38), transparent 30%),
+            linear-gradient(180deg, rgba(248, 246, 241, 0.98), rgba(255, 255, 255, 0.95));
+        font-family: "Manrope", ui-sans-serif, system-ui, sans-serif;
+    }
+
+    ::selection {
+        background: rgba(180, 198, 217, 0.45);
+    }
+
+    [x-cloak] {
+        display: none !important;
+    }
+
+    @keyframes shimmer {
+        0% {
+            transform: translateX(-100%);
+        }
+
+        100% {
+            transform: translateX(100%);
+        }
+    }
+
+    @keyframes float-in {
+        0% {
+            opacity: 0;
+            transform: translateY(12px);
+        }
+
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes pulse-soft {
+        0%,
+        100% {
+            box-shadow: 0 0 0 0 rgba(23, 53, 84, 0.18);
+        }
+
+        50% {
+            box-shadow: 0 0 0 10px rgba(23, 53, 84, 0);
+        }
+    }
+}
+
+@layer components {
+    .panel {
+        @apply rounded-[2rem] border border-white/80 bg-white/90 backdrop-blur-xl;
+        box-shadow:
+            0 24px 60px -40px rgba(15, 23, 42, 0.26),
+            0 12px 28px -24px rgba(100, 116, 139, 0.22);
+    }
+
+    .panel-muted {
+        @apply rounded-[2rem] border border-slate-200/90 bg-slate-100/80;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    }
+
+    .panel-dark {
+        @apply rounded-[2rem] border border-white/10 text-white;
+        background:
+            radial-gradient(circle at top left, rgba(255, 255, 255, 0.12), transparent 32%),
+            radial-gradient(circle at bottom right, rgba(196, 167, 112, 0.16), transparent 26%),
+            linear-gradient(160deg, rgba(23, 53, 84, 0.98), rgba(15, 39, 64, 0.98));
+        box-shadow: 0 30px 80px -42px rgba(15, 23, 42, 0.58);
+    }
+
+    .section-title {
+        @apply text-[0.72rem] font-extrabold uppercase tracking-[0.34em] text-slate-600;
+    }
+
+    .display-title {
+        font-family: "Fraunces", serif;
+        @apply text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl;
+    }
+
+    .lead-text {
+        @apply text-sm leading-7 text-slate-600 sm:text-base;
+    }
+
+    .field-label {
+        @apply mb-2 block text-sm font-semibold text-slate-700;
+    }
+
+    .field-hint {
+        @apply mt-2 text-sm text-slate-500;
+    }
+
+    .field-input {
+        @apply w-full rounded-[1.4rem] border border-slate-200 bg-white/95 px-4 py-3.5 text-sm text-slate-900 transition duration-200 placeholder:text-slate-400 focus:border-slate-400 focus:outline-none focus:ring-4 focus:ring-slate-200;
+        box-shadow: 0 16px 40px -34px rgba(15, 23, 42, 0.18);
+    }
+
+    .field-input:disabled {
+        @apply cursor-not-allowed bg-slate-50 text-slate-400;
+    }
+
+    .field-select {
+        @apply field-input appearance-none pr-12;
+        background-image:
+            linear-gradient(45deg, transparent 50%, rgba(23, 53, 84, 0.85) 50%),
+            linear-gradient(135deg, rgba(23, 53, 84, 0.85) 50%, transparent 50%);
+        background-position:
+            calc(100% - 24px) calc(50% - 2px),
+            calc(100% - 18px) calc(50% - 2px);
+        background-size: 6px 6px, 6px 6px;
+        background-repeat: no-repeat;
+    }
+
+    .field-textarea {
+        @apply field-input min-h-32 resize-y;
+    }
+
+    .btn-primary {
+        @apply inline-flex items-center justify-center gap-2 rounded-[1.35rem] px-5 py-3.5 text-sm font-bold text-white transition duration-200;
+        background: linear-gradient(135deg, rgb(var(--club-brand)), rgb(var(--club-brand-strong)));
+        box-shadow:
+            0 18px 30px -20px rgba(15, 23, 42, 0.45),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow:
+            0 24px 38px -24px rgba(15, 23, 42, 0.52),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-primary:disabled {
+        @apply cursor-not-allowed opacity-60;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .btn-secondary {
+        @apply inline-flex items-center justify-center gap-2 rounded-[1.35rem] border border-slate-200 bg-white/90 px-5 py-3.5 text-sm font-bold text-slate-700 transition duration-200 hover:border-slate-300 hover:bg-slate-50;
+        box-shadow: 0 16px 32px -30px rgba(15, 23, 42, 0.22);
+    }
+
+    .btn-secondary:disabled {
+        @apply cursor-not-allowed opacity-60;
+        box-shadow: none;
+    }
+
+    .btn-danger {
+        @apply inline-flex items-center justify-center gap-2 rounded-[1.35rem] px-5 py-3.5 text-sm font-bold text-white transition duration-200;
+        background: linear-gradient(135deg, rgb(var(--club-danger)), rgb(220 38 38));
+        box-shadow: 0 18px 32px -20px rgba(239, 68, 68, 0.55);
+    }
+
+    .chip {
+        @apply inline-flex items-center rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-[0.18em];
+    }
+
+    .chip-success {
+        @apply chip text-emerald-700;
+        background-color: rgb(var(--club-success-soft));
+    }
+
+    .chip-warning {
+        @apply chip text-amber-700;
+        background-color: rgb(var(--club-warning-soft));
+    }
+
+    .chip-danger {
+        @apply chip text-rose-700;
+        background-color: rgb(var(--club-danger-soft));
+    }
+
+    .chip-info {
+        @apply chip text-sky-700;
+        background-color: rgb(var(--club-info-soft));
+    }
+
+    .chip-brand {
+        @apply chip text-slate-700;
+        background-color: rgb(var(--club-brand-soft));
+    }
+
+    .status-banner {
+        @apply rounded-[1.6rem] border px-5 py-4 text-sm font-medium;
+    }
+
+    .status-banner-success {
+        @apply status-banner border-emerald-100 text-emerald-800;
+        background-color: rgba(220, 252, 231, 0.78);
+    }
+
+    .status-banner-error {
+        @apply status-banner border-rose-100 text-rose-800;
+        background-color: rgba(254, 226, 226, 0.8);
+    }
+
+    .stat-card {
+        @apply panel relative overflow-hidden p-6;
+    }
+
+    .stat-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            radial-gradient(circle at top right, rgba(204, 216, 230, 0.44), transparent 24%),
+            linear-gradient(180deg, rgba(255, 255, 255, 0.18), transparent 60%);
+        pointer-events: none;
+    }
+
+    .table-shell {
+        @apply overflow-hidden rounded-[2rem] border border-white/80 bg-white/90;
+        box-shadow: 0 20px 50px -36px rgba(15, 23, 42, 0.22);
+    }
+
+    .table-header-cell {
+        @apply bg-slate-100/90 px-6 py-4 text-left text-xs font-extrabold uppercase tracking-[0.22em] text-slate-500;
+    }
+
+    .table-row {
+        @apply border-t border-slate-100 transition duration-150 hover:bg-slate-50/80;
+    }
+
+    .table-cell {
+        @apply px-6 py-4 text-sm text-slate-700;
+    }
+
+    .empty-state {
+        @apply panel px-8 py-10 text-center text-sm text-slate-500;
+    }
+
+    .inline-link {
+        @apply text-sm font-bold text-slate-700 transition hover:text-slate-950;
+    }
+
+    .calendar-shell {
+        @apply relative overflow-hidden rounded-[1.9rem] border border-slate-200/90 bg-white/95 p-5;
+        background:
+            radial-gradient(circle at top right, rgba(228, 235, 243, 0.9), transparent 28%),
+            linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.95));
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+    }
+
+    .calendar-toolbar {
+        @apply flex items-center justify-between gap-3;
+    }
+
+    .calendar-month-badge {
+        @apply flex flex-col items-center text-center;
+    }
+
+    .calendar-helper {
+        @apply mt-2 text-xs font-medium text-slate-500 sm:text-sm;
+    }
+
+    .calendar-status {
+        @apply rounded-[1.2rem] border border-slate-200/80 bg-white/90 px-4 py-3 text-sm font-medium text-slate-600;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+    }
+
+    .calendar-grid-shell {
+        @apply rounded-[1.7rem] border border-slate-200/80 bg-white/80 p-3 sm:p-4;
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.9),
+            0 18px 38px -34px rgba(15, 23, 42, 0.18);
+    }
+
+    .calendar-weekday {
+        @apply pb-2 text-center text-[0.72rem] font-extrabold uppercase tracking-[0.28em] text-slate-500;
+    }
+
+    .calendar-grid {
+        @apply grid grid-cols-7 gap-2;
+    }
+
+    .calendar-day {
+        @apply relative flex min-h-[4.9rem] flex-col justify-between rounded-[1.35rem] border border-transparent px-3 py-3 text-left transition duration-200;
+        animation: float-in 220ms ease-out;
+        box-shadow: 0 18px 30px -28px rgba(15, 23, 42, 0.2);
+    }
+
+    .calendar-day-content {
+        @apply flex min-h-full flex-col justify-between;
+    }
+
+    .calendar-day-number {
+        @apply text-lg font-extrabold leading-none text-slate-900;
+    }
+
+    .calendar-day-caption {
+        @apply mt-3 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-slate-500;
+    }
+
+    .calendar-day.is-other-month {
+        @apply min-h-[4.9rem] border border-dashed border-slate-100 bg-slate-50/30;
+        box-shadow: none;
+    }
+
+    .calendar-day.is-other-month .calendar-day-number {
+        @apply text-slate-300;
+    }
+
+    .calendar-day.is-disabled {
+        @apply cursor-not-allowed;
+    }
+
+    .calendar-day.is-disabled:not(.is-other-month) {
+        @apply border-slate-100 bg-slate-50/92;
+    }
+
+    .calendar-day.is-disabled:not(.is-other-month) .calendar-day-number {
+        @apply text-slate-400;
+    }
+
+    .calendar-day.is-disabled:not(.is-other-month) .calendar-day-caption {
+        @apply text-slate-400;
+    }
+
+    .calendar-day.is-available {
+        @apply cursor-pointer border-emerald-100 bg-emerald-50/80;
+    }
+
+    .calendar-day.is-available:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 24px 38px -26px rgba(16, 185, 129, 0.28);
+    }
+
+    .calendar-day.is-partial {
+        @apply cursor-pointer border-amber-100;
+        background:
+            linear-gradient(180deg, rgba(255, 251, 235, 0.98), rgba(245, 240, 231, 0.9));
+    }
+
+    .calendar-day.is-partial:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 24px 38px -26px rgba(245, 158, 11, 0.22);
+    }
+
+    .calendar-day.is-unavailable {
+        @apply border-slate-100 bg-slate-50/92;
+    }
+
+    .calendar-day.is-today:not(.is-selected) {
+        animation: pulse-soft 2.4s ease-in-out infinite;
+        box-shadow:
+            0 0 0 1px rgba(23, 53, 84, 0.14),
+            0 18px 30px -28px rgba(15, 23, 42, 0.2);
+    }
+
+    .calendar-day.is-selected {
+        @apply border-transparent text-white;
+        background: linear-gradient(135deg, rgb(var(--club-brand)), rgb(var(--club-accent)));
+        transform: translateY(-2px) scale(1.01);
+        box-shadow:
+            0 26px 42px -24px rgba(15, 23, 42, 0.46),
+            inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    }
+
+    .calendar-day.is-selected .calendar-day-number,
+    .calendar-day.is-selected .calendar-day-caption {
+        @apply text-white;
+    }
+
+    .calendar-day-dot {
+        @apply absolute right-3 top-3 h-2.5 w-2.5 rounded-full;
+        box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.9);
+    }
+
+    .calendar-day.is-available .calendar-day-dot {
+        background-color: rgb(var(--club-success));
+    }
+
+    .calendar-day.is-partial .calendar-day-dot {
+        background-color: rgb(var(--club-warning));
+    }
+
+    .calendar-day.is-unavailable .calendar-day-dot,
+    .calendar-day.is-disabled .calendar-day-dot {
+        background-color: rgb(var(--club-danger));
+        opacity: 0.45;
+    }
+
+    .calendar-legend {
+        @apply flex flex-wrap gap-3 text-xs font-semibold text-slate-500;
+    }
+
+    .calendar-legend-item {
+        @apply inline-flex items-center gap-2;
+    }
+
+    .calendar-legend-swatch {
+        @apply h-2.5 w-2.5 rounded-full;
+    }
+
+    .calendar-day-skeleton {
+        @apply min-h-[4.9rem] overflow-hidden rounded-[1.35rem] border border-slate-200/70 bg-slate-100/90;
+        position: relative;
+    }
+
+    .slot-stage {
+        @apply rounded-[1.7rem] border border-slate-200/80 bg-slate-50/70 p-4 sm:p-5;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
+    }
+
+    .slot-status {
+        @apply text-sm font-semibold text-slate-600;
+    }
+
+    .slot-grid {
+        @apply grid gap-4 sm:grid-cols-2 xl:grid-cols-3;
+    }
+
+    .slot-button {
+        @apply rounded-[1.45rem] border border-slate-200 bg-white px-4 py-4 text-left transition duration-200;
+        animation: float-in 240ms ease-out;
+        box-shadow:
+            0 20px 34px -30px rgba(15, 23, 42, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.78);
+    }
+
+    .slot-button-row {
+        @apply flex items-start justify-between gap-3;
+    }
+
+    .slot-button:hover {
+        @apply border-slate-300 bg-slate-50;
+        transform: translateY(-2px);
+    }
+
+    .slot-button.is-selected {
+        @apply border-transparent text-white;
+        background: linear-gradient(135deg, rgb(var(--club-brand)), rgb(var(--club-brand-strong)));
+        box-shadow:
+            0 26px 40px -22px rgba(15, 23, 42, 0.42),
+            inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    }
+
+    .slot-button:disabled {
+        @apply cursor-not-allowed border-slate-100 bg-slate-50 text-slate-400 shadow-none;
+        transform: none;
+    }
+
+    .slot-time {
+        font-family: "Fraunces", serif;
+        @apply text-2xl font-semibold leading-none;
+    }
+
+    .slot-duration {
+        @apply mt-2 text-sm font-semibold text-slate-500;
+    }
+
+    .slot-meta {
+        @apply mt-4 text-sm leading-6 text-slate-600;
+    }
+
+    .slot-button.is-selected .slot-duration,
+    .slot-button.is-selected .slot-meta {
+        @apply text-white/85;
+    }
+
+    .slot-badge {
+        @apply inline-flex rounded-full px-3 py-1.5 text-[0.68rem] font-extrabold uppercase tracking-[0.18em];
+    }
+
+    .slot-badge.is-available {
+        @apply text-emerald-700;
+        background-color: rgb(var(--club-success-soft));
+    }
+
+    .slot-badge.is-unavailable {
+        @apply text-rose-700;
+        background-color: rgb(var(--club-danger-soft));
+    }
+
+    .slot-button.is-selected .slot-badge {
+        @apply bg-white/15 text-white;
+    }
+
+    .slot-empty-state {
+        @apply col-span-full flex flex-col rounded-[1.45rem] border border-dashed border-slate-200 bg-white/80 px-5 py-8 text-center;
+    }
+
+    .slot-empty-state strong {
+        @apply text-base font-bold text-slate-800;
+    }
+
+    .slot-empty-state span {
+        @apply mt-2 text-sm text-slate-500;
+    }
+
+    .slot-skeleton {
+        @apply overflow-hidden rounded-[1.45rem] border border-slate-200/80 bg-white/90 px-4 py-4;
+        position: relative;
+        box-shadow: 0 16px 32px -30px rgba(15, 23, 42, 0.16);
+    }
+
+    .slot-skeleton-line {
+        @apply rounded-full bg-slate-200/90;
+        height: 0.8rem;
+        margin-top: 0.75rem;
+    }
+
+    .slot-skeleton-line:first-child {
+        margin-top: 0;
+    }
+
+    .slot-skeleton-line-lg {
+        width: 44%;
+        height: 1.7rem;
+    }
+
+    .slot-skeleton-line-md {
+        width: 72%;
+    }
+
+    .slot-skeleton-line-sm {
+        width: 34%;
+    }
+
+    .selection-summary {
+        @apply rounded-[1.6rem] border border-slate-200/90 p-5;
+        background:
+            linear-gradient(135deg, rgba(241, 245, 249, 0.94), rgba(255, 255, 255, 0.92)),
+            linear-gradient(135deg, rgba(228, 235, 243, 0.45), transparent);
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.88),
+            0 18px 34px -30px rgba(15, 23, 42, 0.16);
+    }
+
+    .summary-label {
+        @apply text-[0.72rem] font-extrabold uppercase tracking-[0.28em] text-slate-600;
+    }
+
+    .summary-value {
+        @apply mt-2 text-base font-bold text-slate-900;
+    }
+
+    .shimmer::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.72), transparent);
+        animation: shimmer 1.25s infinite;
+    }
+
+    .nav-pill {
+        @apply inline-flex items-center rounded-full px-4 py-2.5 text-sm font-bold transition duration-200;
+    }
+
+    .nav-pill-active {
+        @apply nav-pill text-white;
+        background: linear-gradient(135deg, rgb(var(--club-brand)), rgb(var(--club-brand-strong)));
+        box-shadow: 0 16px 28px -18px rgba(15, 23, 42, 0.36);
+    }
+
+    .nav-pill-idle {
+        @apply nav-pill border border-slate-200 bg-white/80 text-slate-600 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900;
+    }
+
+    .app-shell {
+        @apply mx-auto flex min-h-screen w-full max-w-[118rem] gap-6 px-4 py-4 sm:px-6 lg:px-6 xl:gap-8;
+    }
+
+    .sidebar-panel {
+        @apply panel sticky top-4 flex h-[calc(100vh-2rem)] w-full max-w-[20rem] flex-col overflow-hidden;
+    }
+
+    .sidebar-panel-mobile {
+        @apply static h-full max-w-none rounded-[2rem];
+    }
+
+    .sidebar-panel__inner {
+        @apply flex h-full flex-col gap-6 overflow-y-auto px-4 py-4 sm:px-5;
+    }
+
+    .sidebar-context {
+        @apply rounded-[1.7rem] border border-slate-200/80 bg-slate-100/80 px-4 py-4;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+    }
+
+    .sidebar-nav-section {
+        @apply min-h-0 flex-1;
+    }
+
+    .sidebar-nav {
+        @apply mt-4 flex flex-col gap-2;
+    }
+
+    .sidebar-link {
+        @apply inline-flex items-center justify-between rounded-[1.35rem] px-4 py-3 text-sm font-bold transition duration-200;
+    }
+
+    .sidebar-link-active {
+        @apply sidebar-link text-white;
+        background: linear-gradient(135deg, rgb(var(--club-brand)), rgb(var(--club-brand-strong)));
+        box-shadow: 0 16px 28px -18px rgba(15, 23, 42, 0.34);
+    }
+
+    .sidebar-link-idle {
+        @apply sidebar-link border border-slate-200 bg-white/80 text-slate-600 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-950;
+    }
+
+    .sidebar-footer {
+        @apply mt-auto flex flex-col gap-3;
+    }
+
+    .sidebar-user-card {
+        @apply rounded-[1.7rem] border border-slate-200/80 bg-white/80 px-4 py-4;
+        box-shadow:
+            0 18px 38px -30px rgba(15, 23, 42, 0.18),
+            inset 0 1px 0 rgba(255, 255, 255, 0.68);
+    }
+
+    .sidebar-close {
+        @apply inline-flex h-11 w-11 items-center justify-center rounded-[1.2rem] border border-slate-200 bg-white/90 text-slate-600 transition duration-200 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-950;
+        box-shadow: 0 16px 30px -28px rgba(15, 23, 42, 0.22);
+    }
+
+    .mobile-topbar {
+        @apply panel mb-4 flex items-center gap-3 px-4 py-3 sm:px-5 lg:hidden;
+    }
+
+    .mobile-topbar__menu {
+        @apply inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-[1.3rem] border border-slate-200 bg-white/90 text-slate-700 transition duration-200 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-950;
+        box-shadow: 0 16px 34px -28px rgba(15, 23, 42, 0.24);
+    }
+
+    .mobile-topbar__eyebrow {
+        @apply text-[0.68rem] font-extrabold uppercase tracking-[0.28em] text-slate-500;
+    }
+
+    .mobile-topbar__title {
+        @apply mt-1 text-sm font-bold text-slate-950;
+    }
+
+    .mobile-sidebar-overlay {
+        @apply fixed inset-0 z-40 bg-slate-950/35 backdrop-blur-sm;
+    }
+
+    .mobile-sidebar {
+        @apply fixed inset-y-0 left-0 z-50 w-[min(22rem,calc(100vw-1.5rem))] p-3;
+    }
+
+    .nav-section-shell {
+        @apply rounded-[1.6rem] border border-slate-200/80 bg-slate-100/70 p-3;
+    }
+
+    .nav-section-label {
+        @apply text-[0.68rem] font-extrabold uppercase tracking-[0.28em] text-slate-600;
+    }
+
+    .context-card {
+        @apply rounded-[1.6rem] border border-slate-200/80 bg-slate-100/80 px-4 py-4;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.68);
+    }
+
+    .hero-stat {
+        @apply rounded-[1.6rem] border border-white/10 bg-white/10 px-4 py-4 backdrop-blur-sm;
+    }
+
+    .analytics-track {
+        @apply h-3 overflow-hidden rounded-full bg-slate-100;
+    }
+
+    .analytics-fill {
+        @apply h-full rounded-full;
+        background: linear-gradient(135deg, rgb(var(--club-brand)), rgb(var(--club-brand-strong)));
+    }
+
+    .analytics-fill-rose {
+        background: linear-gradient(135deg, rgb(var(--club-accent)), rgb(var(--club-brand)));
+    }
+
+    .analytics-fill-emerald {
+        background: linear-gradient(135deg, rgb(var(--club-success)), rgb(5 150 105));
+    }
+
+    .analytics-fill-amber {
+        background: linear-gradient(135deg, rgb(var(--club-warning)), rgb(217 119 6));
+    }
+
+    .chart-shell {
+        @apply relative overflow-hidden rounded-[1.75rem] border border-slate-200/80 bg-slate-50/75 p-4;
+        min-height: 320px;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
+    }
+
+    .chart-shell.chart-shell-compact {
+        min-height: 260px;
+    }
+
+    .chart-shell canvas {
+        @apply h-full w-full;
+    }
+
+    .branch-tab-nav {
+        @apply flex flex-wrap gap-2 rounded-[1.8rem] border border-white/80 bg-white/90 p-3;
+        box-shadow: 0 20px 50px -36px rgba(76, 29, 149, 0.28);
+    }
+
+    .branch-tab-link {
+        @apply inline-flex items-center rounded-[1.2rem] px-4 py-3 text-sm font-bold text-slate-600 transition duration-200 hover:bg-slate-100 hover:text-slate-900;
+    }
+
+    .branch-tab-link-active {
+        @apply inline-flex items-center rounded-[1.2rem] px-4 py-3 text-sm font-bold text-white;
+        background: linear-gradient(135deg, rgb(var(--club-brand)), rgb(var(--club-accent)));
+        box-shadow: 0 18px 32px -22px rgba(124, 58, 237, 0.64);
+    }
+
+    .branch-highlight-card {
+        @apply rounded-[1.65rem] border border-white/10 bg-white/10 p-5 text-white backdrop-blur-sm;
+    }
+
+    .insight-list {
+        @apply space-y-3;
+    }
+
+    .insight-row {
+        @apply flex items-start justify-between gap-4 rounded-[1.35rem] border border-slate-100 bg-white/70 px-4 py-4 text-sm text-slate-700;
+    }
+
+    .insight-row strong {
+        @apply text-slate-950;
+    }
+
+    .soft-divider {
+        @apply border-t border-slate-200/80;
+    }
+
+    .membership-card-stack {
+        @apply space-y-5;
+    }
+
+    .membership-card-grid {
+        @apply grid gap-5 xl:grid-cols-2;
+    }
+
+    .membership-card-face {
+        @apply relative overflow-hidden rounded-[2rem] border border-white/15 p-6 text-white sm:p-7;
+        aspect-ratio: 1.58 / 1;
+        min-height: 22rem;
+        box-shadow:
+            0 30px 72px -42px rgba(15, 23, 42, 0.55),
+            inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    }
+
+    .membership-card-face::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(120deg, rgba(255, 255, 255, 0.14), transparent 34%),
+            radial-gradient(circle at top right, rgba(255, 255, 255, 0.18), transparent 22%);
+        pointer-events: none;
+    }
+
+    .membership-card-face--front {
+        background:
+            radial-gradient(circle at top left, rgba(255, 255, 255, 0.16), transparent 34%),
+            radial-gradient(circle at bottom right, rgba(201, 166, 98, 0.22), transparent 24%),
+            linear-gradient(145deg, rgba(17, 24, 39, 0.98), rgba(23, 53, 84, 0.98) 58%, rgba(109, 76, 30, 0.96));
+    }
+
+    .membership-card-face--back {
+        background:
+            radial-gradient(circle at top left, rgba(255, 255, 255, 0.2), transparent 28%),
+            radial-gradient(circle at bottom right, rgba(209, 213, 219, 0.16), transparent 22%),
+            linear-gradient(145deg, rgba(24, 24, 27, 0.98), rgba(51, 65, 85, 0.98) 54%, rgba(23, 53, 84, 0.96));
+    }
+
+    .membership-card-face__glow {
+        @apply absolute -right-16 -top-16 h-44 w-44 rounded-full;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.22), transparent 68%);
+        filter: blur(6px);
+        pointer-events: none;
+    }
+
+    .membership-card-face__header {
+        @apply relative z-10 flex items-start justify-between gap-4;
+    }
+
+    .membership-card-face__eyebrow {
+        @apply text-[0.68rem] font-extrabold uppercase tracking-[0.32em];
+        color: rgba(255, 255, 255, 0.65);
+    }
+
+    .membership-card-brand {
+        @apply mt-2 text-base font-bold text-white;
+    }
+
+    .membership-card-type {
+        @apply inline-flex items-center rounded-full px-4 py-2 text-[0.68rem] font-extrabold uppercase tracking-[0.24em];
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        background-color: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(12px);
+    }
+
+    .membership-card-type--light {
+        background-color: rgba(255, 255, 255, 0.12);
+        color: rgb(255, 255, 255);
+    }
+
+    .membership-card-front__body {
+        @apply relative z-10 mt-6 grid gap-5 md:grid-cols-[auto_1fr] md:items-start;
+    }
+
+    .membership-card-chip {
+        @apply h-12 w-16 rounded-[1rem];
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        background:
+            linear-gradient(135deg, rgba(255, 240, 199, 0.95), rgba(184, 142, 73, 0.86)),
+            linear-gradient(180deg, rgba(255, 255, 255, 0.16), transparent);
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.5),
+            0 16px 28px -18px rgba(15, 23, 42, 0.42);
+    }
+
+    .membership-card-photo {
+        @apply h-28 w-24 overflow-hidden rounded-[1.6rem] shadow-2xl sm:h-32 sm:w-28;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .membership-card-photo__image {
+        @apply h-full w-full object-cover;
+    }
+
+    .membership-card-photo__placeholder {
+        @apply flex h-full w-full items-center justify-center text-3xl font-extrabold text-white;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.05));
+    }
+
+    .membership-card-front__identity {
+        @apply flex flex-col;
+    }
+
+    .membership-card-name {
+        font-family: "Fraunces", serif;
+        @apply mt-2 text-3xl font-semibold leading-tight text-white sm:text-[2rem];
+    }
+
+    .membership-card-number {
+        font-family: "Fraunces", serif;
+        @apply mt-4 text-2xl font-semibold tracking-[0.18em] text-white sm:text-[2rem];
+    }
+
+    .membership-card-meta-grid {
+        @apply mt-5 grid gap-3 sm:grid-cols-2;
+    }
+
+    .membership-card-meta {
+        @apply rounded-[1.25rem] px-4 py-3;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background-color: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(12px);
+    }
+
+    .membership-card-meta--light {
+        background-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .membership-card-label {
+        @apply text-[0.68rem] font-extrabold uppercase tracking-[0.24em];
+        color: rgba(255, 255, 255, 0.58);
+    }
+
+    .membership-card-value {
+        @apply mt-2 text-sm font-semibold leading-6;
+        color: rgba(255, 255, 255, 0.92);
+    }
+
+    .membership-card-front__footer {
+        @apply relative z-10 mt-5 flex flex-col gap-4 border-t border-white/10 pt-4 sm:flex-row sm:items-end sm:justify-between;
+    }
+
+    .membership-card-status-badge {
+        @apply inline-flex items-center self-start rounded-full px-4 py-2 text-xs font-extrabold uppercase tracking-[0.22em];
+    }
+
+    .membership-card-status-badge--success {
+        background-color: rgba(110, 231, 183, 0.2);
+        color: rgb(236, 253, 245);
+    }
+
+    .membership-card-status-badge--warning {
+        background-color: rgba(252, 211, 77, 0.2);
+        color: rgb(255, 251, 235);
+    }
+
+    .membership-card-status-badge--danger {
+        background-color: rgba(253, 164, 175, 0.2);
+        color: rgb(255, 241, 242);
+    }
+
+    .membership-card-status-badge--info {
+        background-color: rgba(125, 211, 252, 0.2);
+        color: rgb(240, 249, 255);
+    }
+
+    .membership-card-strip {
+        @apply absolute left-0 right-0 top-8 h-14;
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.92), rgba(15, 23, 42, 0.7));
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .membership-card-back__body {
+        @apply relative z-10 mt-20 grid gap-5 md:grid-cols-[auto_1fr] md:items-center;
+    }
+
+    .membership-card-qr-shell {
+        @apply flex items-center justify-center rounded-[1.7rem] p-4 shadow-2xl;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background-color: rgba(255, 255, 255, 0.92);
+        min-height: 12rem;
+        min-width: 12rem;
+    }
+
+    .membership-card-qr {
+        @apply flex h-full w-full items-center justify-center text-center text-sm font-bold text-slate-900;
+    }
+
+    .membership-card-qr svg {
+        width: 100%;
+        height: auto;
+        max-width: 10rem;
+    }
+
+    .membership-card-qr--placeholder {
+        @apply rounded-[1.3rem] border border-dashed border-slate-300 bg-slate-100 px-4 py-8 text-slate-500;
+    }
+
+    .membership-card-back__content {
+        @apply flex flex-col gap-4;
+    }
+
+    .membership-card-instruction {
+        @apply mt-3 text-sm leading-7;
+        color: rgba(255, 255, 255, 0.78);
+    }
+
+    .membership-card-back__meta {
+        @apply grid gap-3 sm:grid-cols-2;
+    }
+
+    .membership-card-validation-link {
+        @apply inline-flex items-center justify-center self-start rounded-full px-4 py-2.5 text-sm font-bold text-white transition duration-200;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        background-color: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(12px);
+    }
+
+    .membership-card-validation-link:hover {
+        background-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .profile-shell {
+        @apply rounded-[2rem] border border-white/80 bg-white/90 p-4 sm:p-6;
+        box-shadow:
+            0 20px 56px -38px rgba(76, 29, 149, 0.24),
+            inset 0 1px 0 rgba(255, 255, 255, 0.76);
+    }
+
+    .profile-shell__header {
+        @apply flex flex-col gap-5 border-b border-violet-100/90 pb-5;
+    }
+
+    .profile-tabs {
+        @apply flex gap-2 overflow-x-auto pb-1 sm:flex-wrap;
+        scrollbar-width: none;
+    }
+
+    .profile-tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .profile-tab {
+        @apply inline-flex shrink-0 items-center justify-center rounded-full border border-violet-100 bg-white/90 px-4 py-2.5 text-sm font-bold text-slate-600 transition duration-200 hover:border-violet-200 hover:bg-violet-50/80 hover:text-slate-900;
+        box-shadow: 0 14px 28px -26px rgba(76, 29, 149, 0.26);
+    }
+
+    .profile-tab.is-active {
+        @apply border-transparent text-white;
+        background: linear-gradient(135deg, rgb(var(--club-brand)), rgb(var(--club-accent)));
+        box-shadow: 0 18px 34px -20px rgba(124, 58, 237, 0.52);
+    }
+
+    .profile-tab-panel {
+        @apply pt-6;
+    }
+
+    .club-hero {
+        @apply relative min-h-[28rem] overflow-hidden rounded-[2.8rem];
+        height: min(70vh, 52rem);
+        box-shadow: 0 34px 80px -46px rgba(15, 23, 42, 0.5);
+    }
+
+    .club-hero__image {
+        @apply absolute inset-0 h-full w-full object-cover;
+    }
+
+    .club-hero__overlay {
+        @apply absolute inset-0;
+        background:
+            linear-gradient(180deg, rgba(15, 23, 42, 0.08), rgba(15, 23, 42, 0.34)),
+            linear-gradient(90deg, rgba(15, 23, 42, 0.72), rgba(15, 23, 42, 0.18) 58%, rgba(15, 23, 42, 0.28));
+    }
+
+    .club-hero__content {
+        @apply relative flex h-full items-end p-6 sm:p-10 lg:p-14;
+    }
+
+    .club-gallery {
+        @apply grid gap-4 md:grid-cols-3;
+        grid-auto-rows: minmax(220px, 1fr);
+    }
+
+    .club-gallery__item {
+        @apply relative overflow-hidden rounded-[2rem];
+        box-shadow: 0 26px 50px -38px rgba(15, 23, 42, 0.38);
+    }
+
+    .club-gallery__item--featured {
+        @apply md:col-span-2 md:row-span-2;
+        min-height: 28rem;
+    }
+
+    .club-gallery__image {
+        @apply h-full w-full object-cover transition duration-500;
+    }
+
+    .club-gallery__item:hover .club-gallery__image {
+        transform: scale(1.03);
+    }
+
+    .club-gallery__caption {
+        @apply absolute inset-x-0 bottom-0 px-5 py-4 text-sm font-semibold text-white;
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0), rgba(15, 23, 42, 0.72));
+    }
+
+    .club-unit-card {
+        @apply flex h-full flex-col justify-between rounded-[2rem] border border-white/70 bg-white/90 p-6;
+        box-shadow: 0 22px 48px -38px rgba(15, 23, 42, 0.22);
+    }
+
+    .club-plan-card {
+        @apply relative rounded-[2.2rem] border border-white/80 bg-white/90 p-6;
+        box-shadow: 0 26px 54px -42px rgba(15, 23, 42, 0.26);
+    }
+
+    .club-plan-card--recommended {
+        @apply border-white/10 text-white;
+        background:
+            radial-gradient(circle at top left, rgba(255, 255, 255, 0.12), transparent 32%),
+            radial-gradient(circle at bottom right, rgba(196, 167, 112, 0.18), transparent 26%),
+            linear-gradient(160deg, rgba(23, 53, 84, 0.98), rgba(15, 39, 64, 0.98));
+        box-shadow: 0 34px 74px -46px rgba(15, 23, 42, 0.54);
+    }
+
+    .club-plan-card__badge {
+        @apply absolute right-5 top-5 rounded-full bg-white/15 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-white;
+    }
+
+    .club-plan-card__benefit {
+        @apply rounded-[1.35rem] border border-slate-200 bg-slate-50/80 px-4 py-3 text-sm text-slate-700;
+    }
+
+    .club-plan-card__benefit--recommended {
+        @apply border-white/10 bg-white/10 text-slate-100;
+    }
+}
+
+@media (max-width: 640px) {
+    .calendar-toolbar {
+        @apply gap-2;
+    }
+
+    .calendar-helper {
+        @apply max-w-[13rem];
+    }
+
+    .calendar-grid {
+        @apply gap-1.5;
+    }
+
+    .calendar-day,
+    .calendar-day.is-other-month,
+    .calendar-day-skeleton {
+        min-height: 4.2rem;
+        padding: 0.65rem;
+        border-radius: 1rem;
+    }
+
+    .calendar-day-number {
+        @apply text-base;
+    }
+
+    .calendar-day-caption {
+        @apply mt-2 text-[0.6rem];
+    }
+
+    .slot-button-row {
+        @apply flex-col items-start;
+    }
+
+    .membership-card-face {
+        aspect-ratio: auto;
+        min-height: auto;
+    }
+
+    .membership-card-front__body,
+    .membership-card-back__body {
+        @apply grid-cols-1;
+    }
+
+    .membership-card-qr-shell {
+        min-width: 0;
+        width: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+@media (max-width: 767px) {
+    .app-shell {
+        @apply gap-0 px-3 py-3;
+    }
+
+    .sidebar-panel__inner {
+        @apply px-4 py-4;
+    }
+
+    .club-hero {
+        height: auto;
+    }
+
+    .club-gallery {
+        grid-template-columns: 1fr;
+        grid-auto-rows: minmax(220px, 1fr);
+    }
+
+    .club-gallery__item--featured {
+        min-height: 20rem;
+    }
+}

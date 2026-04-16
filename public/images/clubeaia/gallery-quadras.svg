@@ -1,0 +1,16 @@
+<svg width="900" height="700" viewBox="0 0 900 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="900" height="700" fill="#204D35"/>
+<rect width="900" height="700" fill="url(#paint0_linear_quadras)"/>
+<rect x="116" y="98" width="668" height="420" rx="34" fill="#6DA676"/>
+<rect x="143" y="125" width="614" height="366" rx="22" stroke="white" stroke-opacity="0.6" stroke-width="8"/>
+<path d="M450 125V491" stroke="white" stroke-opacity="0.6" stroke-width="8"/>
+<path d="M143 308H757" stroke="white" stroke-opacity="0.6" stroke-width="8"/>
+<rect x="0" y="550" width="900" height="150" fill="#132A1D" fill-opacity="0.48"/>
+<text x="94" y="624" fill="white" fill-opacity="0.92" font-family="Manrope, Arial, sans-serif" font-size="34" font-weight="700">Quadras e esporte</text>
+<defs>
+<linearGradient id="paint0_linear_quadras" x1="900" y1="700" x2="48" y2="55" gradientUnits="userSpaceOnUse">
+<stop stop-color="#173D2A"/>
+<stop offset="1" stop-color="#3E7450"/>
+</linearGradient>
+</defs>
+</svg>

@@ -1,0 +1,16 @@
+<svg width="900" height="700" viewBox="0 0 900 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="900" height="700" fill="#473225"/>
+<rect width="900" height="700" fill="url(#paint0_linear_lounge)"/>
+<rect x="104" y="128" width="692" height="250" rx="34" fill="#8E6A4A"/>
+<rect x="148" y="434" width="212" height="96" rx="28" fill="#E6D3B2" fill-opacity="0.58"/>
+<rect x="388" y="420" width="128" height="110" rx="28" fill="#F3E4C8" fill-opacity="0.45"/>
+<rect x="542" y="434" width="212" height="96" rx="28" fill="#E6D3B2" fill-opacity="0.58"/>
+<rect x="0" y="550" width="900" height="150" fill="#1A120D" fill-opacity="0.42"/>
+<text x="98" y="622" fill="white" fill-opacity="0.92" font-family="Manrope, Arial, sans-serif" font-size="34" font-weight="700">Lounge e convivio</text>
+<defs>
+<linearGradient id="paint0_linear_lounge" x1="900" y1="700" x2="62" y2="58" gradientUnits="userSpaceOnUse">
+<stop stop-color="#2E1E15"/>
+<stop offset="1" stop-color="#7D5C40"/>
+</linearGradient>
+</defs>
+</svg>
