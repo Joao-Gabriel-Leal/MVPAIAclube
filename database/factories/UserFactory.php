@@ -28,6 +28,7 @@ class UserFactory extends Factory
             'card_suffix' => null,
             'card_public_token' => null,
             'profile_photo_path' => null,
+            'profile_photo_media_asset_id' => null,
             'branch_id' => null,
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),

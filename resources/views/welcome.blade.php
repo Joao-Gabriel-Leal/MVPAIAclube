@@ -28,8 +28,15 @@
             </header>
 
             <section class="club-hero mt-4 overflow-hidden">
-                <img src="{{ $heroImage }}" alt="Banner principal do ClubeAIA" class="club-hero__image">
-                <div class="club-hero__overlay"></div>
+                @if ($heroImageUrl)
+                    <img src="{{ $heroImageUrl }}" alt="Banner principal do ClubeAIA" class="club-hero__image">
+                    <div class="club-hero__overlay"></div>
+                @else
+                    <div class="club-hero__placeholder">
+                        <div class="club-hero__placeholder-badge">Banner aguardando foto oficial</div>
+                    </div>
+                    <div class="club-hero__overlay club-hero__overlay--placeholder"></div>
+                @endif
 
                 <div class="club-hero__content">
                     <div class="max-w-2xl">
@@ -63,7 +70,13 @@
                 <div class="club-gallery mt-6">
                     @foreach ($galleryImages as $image)
                         <article class="club-gallery__item {{ $loop->first ? 'club-gallery__item--featured' : '' }}">
-                            <img src="{{ $image['src'] }}" alt="{{ $image['alt'] }}" class="club-gallery__image">
+                            @if ($image['src'])
+                                <img src="{{ $image['src'] }}" alt="{{ $image['alt'] }}" class="club-gallery__image">
+                            @else
+                                <div class="club-gallery__placeholder">
+                                    <span>{{ $image['placeholder'] }}</span>
+                                </div>
+                            @endif
                             <div class="club-gallery__caption">
                                 <span>{{ $image['title'] }}</span>
                             </div>

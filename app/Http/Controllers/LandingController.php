@@ -3,13 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Models\Branch;
+use App\Models\ClubSetting;
 use App\Models\Plan;
+use App\Support\ClubMediaSlots;
 use Illuminate\Support\Str;
 
 class LandingController extends Controller
 {
     public function index()
     {
+        $clubSetting = ClubSetting::current();
+        $homeMediaLibrary = $clubSetting->homeMediaLibrary();
+
         $branches = Branch::query()
             ->active()
             ->orderBy('type')
@@ -55,40 +60,22 @@ class LandingController extends Controller
         return view('welcome', [
             'branches' => $branches,
             'plans' => $plans,
-            'heroImage' => '/images/clubeaia/hero-banner.svg',
+            'heroImageUrl' => $homeMediaLibrary['hero_banner']?->url(),
             'aboutText' => 'O ClubeAIA combina esporte, lazer e convivio em um ambiente pensado para dias mais leves, encontros marcantes e uma rotina de clube que se entende rapido.',
-            'galleryImages' => [
-                [
-                    'src' => '/images/clubeaia/gallery-ambiente.svg',
-                    'alt' => 'Ambiente principal do ClubeAIA',
-                    'title' => 'Ambiente social',
-                ],
-                [
-                    'src' => '/images/clubeaia/gallery-quadras.svg',
-                    'alt' => 'Quadras do ClubeAIA',
-                    'title' => 'Esporte',
-                ],
-                [
-                    'src' => '/images/clubeaia/gallery-piscina.svg',
-                    'alt' => 'Area de piscina do ClubeAIA',
-                    'title' => 'Lazer',
-                ],
-                [
-                    'src' => '/images/clubeaia/gallery-lounge.svg',
-                    'alt' => 'Lounge do ClubeAIA',
-                    'title' => 'Convivio',
-                ],
-                [
-                    'src' => '/images/clubeaia/gallery-fitness.svg',
-                    'alt' => 'Espaco fitness do ClubeAIA',
-                    'title' => 'Bem-estar',
-                ],
-                [
-                    'src' => '/images/clubeaia/gallery-eventos.svg',
-                    'alt' => 'Espaco de eventos do ClubeAIA',
-                    'title' => 'Eventos',
-                ],
-            ],
+            'galleryImages' => collect(ClubMediaSlots::home())
+                ->reject(fn (array $definition, string $slot) => $slot === 'hero_banner')
+                ->map(function (array $definition, string $slot) use ($homeMediaLibrary) {
+                    $asset = $homeMediaLibrary[$slot] ?? null;
+
+                    return [
+                        'slot' => $slot,
+                        'src' => $asset?->url(),
+                        'alt' => 'Imagem institucional do ClubeAIA',
+                        'title' => $definition['gallery_title'] ?? $definition['title'],
+                        'placeholder' => $definition['placeholder_label'],
+                    ];
+                })
+                ->values(),
         ]);
     }
 }

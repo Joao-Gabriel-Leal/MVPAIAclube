@@ -10,12 +10,12 @@ use App\Models\Member;
 use App\Models\Plan;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
+use Tests\Concerns\CreatesPngUploads;
 use Tests\TestCase;
 
 class ProfileTest extends TestCase
 {
+    use CreatesPngUploads;
     use RefreshDatabase;
 
     public function test_profile_page_is_displayed(): void
@@ -107,6 +107,10 @@ class ProfileTest extends TestCase
 
     public function test_member_profile_displays_the_membership_card(): void
     {
+        config([
+            'app.card_public_base_url' => 'http://127.0.0.1:8000',
+        ]);
+
         ClubSetting::query()->updateOrCreate([
             'id' => 1,
         ], [
@@ -142,11 +146,15 @@ class ProfileTest extends TestCase
             ->assertSee('CS-AB12CD')
             ->assertSee('Plano Ouro')
             ->assertSee('Clube Centro')
-            ->assertSee(route('cards.show', 'memberprofiletoken000001'));
+            ->assertSee('http://127.0.0.1:8000/carteirinhas/memberprofiletoken000001');
     }
 
     public function test_dependent_profile_displays_the_membership_card(): void
     {
+        config([
+            'app.card_public_base_url' => 'http://127.0.0.1:8000',
+        ]);
+
         ClubSetting::query()->updateOrCreate([
             'id' => 1,
         ], [
@@ -189,7 +197,7 @@ class ProfileTest extends TestCase
             ->assertSee('Carlos Titular')
             ->assertSee('Filha')
             ->assertSee('Clube Sul')
-            ->assertSee(route('cards.show', 'dependentprofiletoken001'));
+            ->assertSee('http://127.0.0.1:8000/carteirinhas/dependentprofiletoken001');
     }
 
     public function test_admin_profile_does_not_display_the_membership_card(): void
@@ -229,29 +237,33 @@ class ProfileTest extends TestCase
 
     public function test_profile_photo_can_be_uploaded(): void
     {
-        Storage::fake('public');
-
         $user = User::factory()->create();
-        $photoPath = tempnam(sys_get_temp_dir(), 'card-photo-');
-        file_put_contents($photoPath, base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9oN4tWQAAAAASUVORK5CYII='));
-        $uploadedFile = new UploadedFile($photoPath, 'carteirinha.png', 'image/png', null, true);
 
         $response = $this
             ->actingAs($user)
             ->patch(route('profile.update'), [
                 'name' => 'Test User',
                 'email' => $user->email,
-                'profile_photo' => $uploadedFile,
+                'profile_photo' => $this->fakePngUpload('carteirinha.png', 640, 640),
             ]);
 
         $response
             ->assertSessionHasNoErrors()
             ->assertRedirect(route('profile.edit'));
 
-        $this->assertNotNull($user->fresh()->profile_photo_path);
-        Storage::disk('public')->assertExists($user->profile_photo_path);
+        $freshUser = $user->fresh();
 
-        @unlink($photoPath);
+        $this->assertNotNull($freshUser->profile_photo_media_asset_id);
+        $this->assertDatabaseHas('media_assets', [
+            'id' => $freshUser->profile_photo_media_asset_id,
+            'context' => 'profile_photo',
+            'visibility' => 'private',
+        ]);
+
+        $this->actingAs($freshUser)
+            ->get($freshUser->profile_photo_url)
+            ->assertOk()
+            ->assertHeader('content-type', 'image/png');
     }
 
     public function test_profile_validation_errors_keep_the_profile_tab_active(): void

@@ -63,6 +63,28 @@ php artisan serve
 npm run dev
 ```
 
+## Rodar no PC e abrir no celular
+
+Para testar a carteirinha no celular usando a mesma rede Wi-Fi do computador:
+
+```bash
+php artisan serve --host 0.0.0.0 --port 8000
+```
+
+Depois abra no PC:
+
+```text
+http://127.0.0.1:8000
+```
+
+O QR code da carteirinha passa a detectar o IP local da maquina automaticamente quando o sistema estiver em `localhost`, entao o celular consegue abrir a validacao publica na mesma rede.
+
+Se quiser forcar um endereco especifico no QR code, configure:
+
+```env
+CARD_PUBLIC_BASE_URL=http://192.168.0.55:8000
+```
+
 ## Observacoes de produto
 
 - Nao existe superadmin neste MVP.

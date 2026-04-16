@@ -1044,8 +1044,26 @@
             linear-gradient(90deg, rgba(15, 23, 42, 0.72), rgba(15, 23, 42, 0.18) 58%, rgba(15, 23, 42, 0.28));
     }
 
+    .club-hero__overlay--placeholder {
+        background:
+            linear-gradient(180deg, rgba(15, 23, 42, 0.12), rgba(15, 23, 42, 0.4)),
+            linear-gradient(90deg, rgba(15, 23, 42, 0.62), rgba(15, 23, 42, 0.18) 64%, rgba(15, 23, 42, 0.34));
+    }
+
     .club-hero__content {
         @apply relative flex h-full items-end p-6 sm:p-10 lg:p-14;
+    }
+
+    .club-hero__placeholder {
+        @apply absolute inset-0 flex items-start justify-end p-6 sm:p-10;
+        background:
+            radial-gradient(circle at top left, rgba(255, 255, 255, 0.22), transparent 28%),
+            radial-gradient(circle at bottom right, rgba(171, 141, 89, 0.32), transparent 26%),
+            linear-gradient(135deg, rgba(23, 53, 84, 0.94), rgba(15, 39, 64, 0.84), rgba(31, 41, 55, 0.9));
+    }
+
+    .club-hero__placeholder-badge {
+        @apply inline-flex items-center rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-extrabold uppercase tracking-[0.22em] text-white/80 backdrop-blur-sm;
     }
 
     .club-gallery {
@@ -1069,6 +1087,17 @@
 
     .club-gallery__item:hover .club-gallery__image {
         transform: scale(1.03);
+    }
+
+    .club-gallery__placeholder {
+        @apply flex h-full min-h-[220px] w-full items-end p-5 text-white;
+        background:
+            linear-gradient(145deg, rgba(23, 53, 84, 0.96), rgba(15, 39, 64, 0.8)),
+            linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 46%);
+    }
+
+    .club-gallery__placeholder span {
+        @apply inline-flex rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-extrabold uppercase tracking-[0.18em] backdrop-blur-sm;
     }
 
     .club-gallery__caption {
@@ -1105,6 +1134,48 @@
 
     .club-plan-card__benefit--recommended {
         @apply border-white/10 bg-white/10 text-slate-100;
+    }
+
+    .media-slot-card {
+        @apply rounded-[2rem] border border-slate-200/85 bg-slate-50/70 p-5 sm:p-6;
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.78),
+            0 18px 40px -34px rgba(15, 23, 42, 0.16);
+    }
+
+    .media-slot-card__header {
+        @apply flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between;
+    }
+
+    .media-slot-preview {
+        @apply relative overflow-hidden rounded-[1.8rem] border border-slate-200/85 bg-white;
+        min-height: 17rem;
+        box-shadow: 0 22px 46px -34px rgba(15, 23, 42, 0.18);
+    }
+
+    .media-slot-preview--hero {
+        min-height: 22rem;
+    }
+
+    .media-slot-preview__image {
+        @apply h-full w-full object-cover;
+    }
+
+    .media-slot-preview__placeholder {
+        @apply flex h-full min-h-[17rem] w-full items-end bg-slate-900 p-5 text-white;
+        background:
+            radial-gradient(circle at top left, rgba(255, 255, 255, 0.16), transparent 26%),
+            radial-gradient(circle at bottom right, rgba(171, 141, 89, 0.24), transparent 28%),
+            linear-gradient(135deg, rgba(23, 53, 84, 0.96), rgba(15, 39, 64, 0.92));
+    }
+
+    .media-slot-preview__placeholder span {
+        @apply inline-flex rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-extrabold uppercase tracking-[0.2em] text-white/80 backdrop-blur-sm;
+    }
+
+    .media-slot-specs {
+        @apply grid gap-3 rounded-[1.6rem] border border-slate-200/85 bg-white/90 p-4 sm:grid-cols-2;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
     }
 }
 
@@ -1188,5 +1259,10 @@
 
     .club-gallery__item--featured {
         min-height: 20rem;
+    }
+
+    .media-slot-preview,
+    .media-slot-preview--hero {
+        min-height: 14rem;
     }
 }

@@ -26,7 +26,7 @@
 
                 <div class="flex-1">
                     <input id="profile_photo" name="profile_photo" type="file" accept="image/*" class="field-input file:mr-4 file:rounded-full file:border-0 file:bg-violet-100 file:px-4 file:py-2 file:font-semibold file:text-violet-700 hover:file:bg-violet-200">
-                    <p class="field-hint">Envie uma foto nitida para aparecer na carteirinha digital.</p>
+                    <p class="field-hint">Envie uma foto nitida para aparecer na carteirinha digital. A imagem fica armazenada no banco do sistema.</p>
                 </div>
             </div>
             <x-input-error class="mt-2" :messages="$errors->get('profile_photo')" />

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\DependentStatus;
 use App\Enums\MembershipStatus;
 use App\Enums\UserRole;
+use App\Support\CardPublicUrl;
 use App\Support\MaskFormatter;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -13,7 +14,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 
 class User extends Authenticatable
@@ -31,6 +31,7 @@ class User extends Authenticatable
         'card_suffix',
         'card_public_token',
         'profile_photo_path',
+        'profile_photo_media_asset_id',
         'branch_id',
         'password',
     ];
@@ -84,6 +85,11 @@ class User extends Authenticatable
     public function auditLogs()
     {
         return $this->hasMany(AuditLog::class, 'actor_id');
+    }
+
+    public function profilePhotoMedia()
+    {
+        return $this->belongsTo(MediaAsset::class, 'profile_photo_media_asset_id');
     }
 
     public function isAdminMatrix(): bool
@@ -156,14 +162,7 @@ class User extends Authenticatable
             return null;
         }
 
-        $relativePath = URL::route('cards.show', $this->card_public_token, false);
-        $publicBaseUrl = $this->resolveCardPublicBaseUrl();
-
-        if ($publicBaseUrl) {
-            return $publicBaseUrl.$relativePath;
-        }
-
-        return URL::route('cards.show', $this->card_public_token);
+        return CardPublicUrl::buildValidationUrl($this->card_public_token);
     }
 
     public function getCardStatusLabelAttribute(): ?string
@@ -204,11 +203,15 @@ class User extends Authenticatable
 
     public function getProfilePhotoUrlAttribute(): ?string
     {
-        if (! $this->profile_photo_path) {
-            return null;
+        if ($this->profile_photo_media_asset_id) {
+            return route('media.show', $this->profile_photo_media_asset_id);
         }
 
-        return Storage::disk('public')->url($this->profile_photo_path);
+        if ($this->profile_photo_path) {
+            return Storage::disk('public')->url($this->profile_photo_path);
+        }
+
+        return null;
     }
 
     public function getProfileInitialsAttribute(): string
@@ -220,26 +223,5 @@ class User extends Authenticatable
             ->join('');
 
         return $initials !== '' ? $initials : 'CL';
-    }
-
-    protected function resolveCardPublicBaseUrl(): ?string
-    {
-        $configuredBaseUrl = trim((string) config('app.card_public_base_url'));
-
-        if ($configuredBaseUrl !== '') {
-            return rtrim($configuredBaseUrl, '/');
-        }
-
-        if (! app()->bound('request')) {
-            return null;
-        }
-
-        $host = request()->getHost();
-
-        if (in_array($host, ['localhost', '127.0.0.1', '0.0.0.0', '::1', '[::1]'], true)) {
-            return null;
-        }
-
-        return rtrim(request()->getSchemeAndHttpHost(), '/');
     }
 }

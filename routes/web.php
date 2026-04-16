@@ -9,6 +9,7 @@ use App\Http\Controllers\DependentController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\MemberController;
+use App\Http\Controllers\MediaAssetController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\PublicEnrollmentController;
 use App\Http\Controllers\PublicMembershipCardController;
@@ -18,6 +19,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [LandingController::class, 'index'])->name('home');
+Route::get('/midia/{mediaAsset}', [MediaAssetController::class, 'show'])->name('media.show');
 Route::get('/adesao/{branch:slug}', [PublicEnrollmentController::class, 'create'])->name('enrollment.create');
 Route::post('/adesao/{branch:slug}', [PublicEnrollmentController::class, 'store'])->name('enrollment.store');
 Route::get('/carteirinhas/{token}', [PublicMembershipCardController::class, 'show'])->name('cards.show');

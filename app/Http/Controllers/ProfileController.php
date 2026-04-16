@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Services\MediaAssetService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
@@ -34,7 +34,7 @@ class ProfileController extends Controller
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(ProfileUpdateRequest $request, MediaAssetService $mediaAssetService): RedirectResponse
     {
         $user = $request->user();
         $user->fill($request->safe()->only(['name', 'email']));
@@ -43,18 +43,12 @@ class ProfileController extends Controller
             $user->email_verified_at = null;
         }
 
-        $oldProfilePhotoPath = $user->profile_photo_path;
-
         if ($request->hasFile('profile_photo')) {
-            $user->profile_photo_path = $request->file('profile_photo')->store('profile-photos', 'public');
+            $mediaAssetService->replaceUserProfilePhoto($user, $request->file('profile_photo'));
         }
 
         $user->save();
         Cache::forget("dashboard.summary.{$user->id}");
-
-        if ($request->hasFile('profile_photo') && $oldProfilePhotoPath && $oldProfilePhotoPath !== $user->profile_photo_path) {
-            Storage::disk('public')->delete($oldProfilePhotoPath);
-        }
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
