@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreEnrollmentRequest;
 use App\Models\Branch;
+use App\Models\ClubSetting;
 use App\Models\Plan;
 use App\Services\EnrollmentService;
 
@@ -13,6 +14,7 @@ class PublicEnrollmentController extends Controller
     {
         return view('public.enrollment', [
             'branch' => $branch,
+            'clubSetting' => ClubSetting::current(),
             'plans' => Plan::query()->active()->orderBy('id')->get(),
         ]);
     }

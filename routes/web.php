@@ -1,16 +1,20 @@
 <?php
 
 use App\Http\Controllers\AdminUserController;
+use App\Http\Controllers\BenefitController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\ClubResourceController;
 use App\Http\Controllers\ClubSettingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DependentController;
 use App\Http\Controllers\FinanceController;
+use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\MemberController;
+use App\Http\Controllers\MemberInvoiceController;
 use App\Http\Controllers\MediaAssetController;
 use App\Http\Controllers\PlanController;
+use App\Http\Controllers\ProposalController;
 use App\Http\Controllers\PublicEnrollmentController;
 use App\Http\Controllers\PublicMembershipCardController;
 use App\Http\Controllers\ReportController;
@@ -49,10 +53,24 @@ Route::middleware('auth')->group(function () {
         ->only(['index', 'create', 'store']);
     Route::post('reservas/{reservation}/status', [ReservationController::class, 'updateStatus'])->name('reservations.status');
 
+    Route::middleware('role:member,dependent')->group(function () {
+        Route::get('faturas', [MemberInvoiceController::class, 'index'])->name('member-invoices.index');
+        Route::get('faturas/{membership_invoice}', [MemberInvoiceController::class, 'show'])->name('member-invoices.show');
+        Route::get('faturas/{membership_invoice}/comprovante', [MemberInvoiceController::class, 'receipt'])->name('member-invoices.receipt');
+        Route::get('beneficios', [BenefitController::class, 'index'])->name('benefits.index');
+    });
+
     Route::middleware('role:admin_matrix,admin_branch')->group(function () {
+        Route::get('propostas', [ProposalController::class, 'index'])->name('proposals.index');
+
         Route::resource('recursos', ClubResourceController::class)
             ->parameters(['recursos' => 'club_resource'])
             ->except(['destroy', 'show']);
+
+        Route::get('estoque', [InventoryController::class, 'index'])->name('inventory.index');
+        Route::post('estoque/itens', [InventoryController::class, 'storeItem'])->name('inventory.items.store');
+        Route::put('estoque/itens/{inventory_item}', [InventoryController::class, 'updateItem'])->name('inventory.items.update');
+        Route::post('estoque/itens/{inventory_item}/movimentos', [InventoryController::class, 'storeMovement'])->name('inventory.movements.store');
 
         Route::get('financeiro', [FinanceController::class, 'index'])->name('finance.index');
         Route::post('financeiro/gerar', [FinanceController::class, 'generate'])->name('finance.generate');

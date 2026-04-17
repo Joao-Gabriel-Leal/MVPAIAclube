@@ -14,11 +14,11 @@ class ClubResourcePolicy
 
     public function view(User $user, ClubResource $clubResource): bool
     {
-        if ($user->isAdminBranch()) {
-            return $clubResource->branch_id === $user->branch_id;
+        if ($user->isAdminMatrix()) {
+            return true;
         }
 
-        return true;
+        return $user->managedBranchIds()->contains($clubResource->branch_id);
     }
 
     public function create(User $user): bool

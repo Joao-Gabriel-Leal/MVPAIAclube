@@ -81,9 +81,7 @@ class ReservationService
             ->with(['plans', 'schedules', 'blocks'])
             ->findOrFail($data['club_resource_id']);
 
-        if ($actor->isAdminBranch() && $resource->branch_id !== $actor->branch_id) {
-            throw new RuntimeException('O admin da filial nao pode reservar recursos de outra unidade.');
-        }
+        $this->assertActorCanReserveResource($actor, $resource);
 
         [$member, $reserver] = $this->resolveReserver($actor, $data);
 
@@ -202,6 +200,21 @@ class ReservationService
         };
 
         return [$original, round($charged, 2)];
+    }
+
+    protected function assertActorCanReserveResource(User $actor, ClubResource $resource): void
+    {
+        if ($actor->isAdminMatrix()) {
+            return;
+        }
+
+        if (! $actor->managedBranchIds()->contains($resource->branch_id)) {
+            if ($actor->isAdminBranch()) {
+                throw new RuntimeException('O admin da filial nao pode reservar recursos de outra unidade.');
+            }
+
+            throw new RuntimeException('Voce nao pode reservar recursos fora das filiais vinculadas ao seu cadastro.');
+        }
     }
 
     protected function isResourceAvailable(ClubResource $resource, Carbon $date, string $startTime, string $endTime): bool

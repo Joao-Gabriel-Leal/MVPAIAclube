@@ -42,8 +42,12 @@ class DashboardMembershipCardTest extends TestCase
             ->get(route('dashboard'))
             ->assertOk()
             ->assertSee('Carteirinha digital')
+            ->assertSee('Seu acesso principal fica aqui')
             ->assertSee('CS-AB12CD')
-            ->assertSee('Valide esta carteirinha')
+            ->assertSee('Abrir validacao publica')
+            ->assertSee('membership-card-validation-link membership-card-validation-link--external', false)
+            ->assertSee('QR de validacao')
+            ->assertSee('Escaneie para validar a carteirinha.')
             ->assertSee('Plano Premium')
             ->assertSee('Clube Centro');
     }
@@ -86,7 +90,10 @@ class DashboardMembershipCardTest extends TestCase
             ->get(route('dashboard'))
             ->assertOk()
             ->assertSee('Carteirinha digital')
+            ->assertSee('Seu acesso principal fica aqui')
             ->assertSee('CS-QW12ER')
+            ->assertSee('QR de validacao')
+            ->assertSee('Escaneie para validar a carteirinha.')
             ->assertSee('Carlos Titular')
             ->assertSee('Filha')
             ->assertSee('Clube Sul');

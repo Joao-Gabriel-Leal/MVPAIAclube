@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\InvoiceStatus;
 use App\Http\Requests\GenerateInvoicesRequest;
 use App\Http\Requests\MarkInvoicePaidRequest;
 use App\Models\Branch;
 use App\Models\MembershipInvoice;
 use App\Services\BillingService;
+use App\Support\AdminMetricCards;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Validation\Rule;
 
 class FinanceController extends Controller
 {
@@ -16,21 +19,74 @@ class FinanceController extends Controller
     {
         $billingService->refreshOverdueStatuses();
 
-        $query = MembershipInvoice::query()->with(['member.user', 'branch'])->latest('billing_period');
+        $filters = $request->validate([
+            'branch_id' => ['nullable', 'exists:branches,id'],
+            'status' => ['nullable', Rule::in(collect(InvoiceStatus::cases())->map->value->all())],
+            'billing_period' => ['nullable', 'date_format:Y-m'],
+        ]);
 
-        if ($request->user()->isAdminBranch()) {
-            $query->where('branch_id', $request->user()->branch_id);
-        } elseif ($request->filled('branch_id')) {
-            $query->where('branch_id', $request->integer('branch_id'));
+        $selectedBranchId = $request->user()->isAdminBranch()
+            ? $request->user()->branch_id
+            : (isset($filters['branch_id']) ? (int) $filters['branch_id'] : null);
+        $selectedBranch = $selectedBranchId ? Branch::query()->find($selectedBranchId) : null;
+        $statusFilter = $filters['status'] ?? null;
+        $billingPeriod = isset($filters['billing_period'])
+            ? Carbon::createFromFormat('Y-m', $filters['billing_period'])->startOfMonth()
+            : now()->startOfMonth();
+
+        $query = MembershipInvoice::query()
+            ->with(['member.user', 'branch'])
+            ->whereYear('billing_period', $billingPeriod->year)
+            ->whereMonth('billing_period', $billingPeriod->month);
+
+        if ($selectedBranchId) {
+            $query->where('branch_id', $selectedBranchId);
         }
 
-        if ($request->filled('status')) {
-            $query->where('status', $request->string('status'));
+        $summarySnapshot = (clone $query)->get();
+
+        if ($statusFilter) {
+            $query->where('status', $statusFilter);
         }
 
         return view('finance.index', [
-            'invoices' => $query->paginate(20)->withQueryString(),
+            'invoices' => $query->latest('billing_period')->paginate(20)->withQueryString(),
             'branches' => Branch::query()->active()->orderBy('name')->get(),
+            'selectedBranch' => $selectedBranch,
+            'statusFilter' => $statusFilter,
+            'billingPeriod' => $billingPeriod,
+            'filters' => [
+                'branch_id' => $selectedBranchId,
+                'status' => $statusFilter,
+                'billing_period' => $billingPeriod->format('Y-m'),
+            ],
+            'statuses' => InvoiceStatus::cases(),
+            'summary' => [
+                'expected' => AdminMetricCards::currency(
+                    'Mensalidades previstas',
+                    (float) $summarySnapshot->sum('amount'),
+                    AdminMetricCards::competencyContext($billingPeriod, $selectedBranch),
+                    AdminMetricCards::detailCount($summarySnapshot->count(), 'mensalidade')
+                ),
+                'pending' => AdminMetricCards::currency(
+                    'Pendentes',
+                    (float) $summarySnapshot->where('status', InvoiceStatus::Pending)->sum('amount'),
+                    AdminMetricCards::competencyContext($billingPeriod, $selectedBranch),
+                    AdminMetricCards::detailCount($summarySnapshot->where('status', InvoiceStatus::Pending)->count(), 'mensalidade')
+                ),
+                'paid' => AdminMetricCards::currency(
+                    'Pagas',
+                    (float) $summarySnapshot->where('status', InvoiceStatus::Paid)->sum('amount'),
+                    AdminMetricCards::competencyContext($billingPeriod, $selectedBranch),
+                    AdminMetricCards::detailCount($summarySnapshot->where('status', InvoiceStatus::Paid)->count(), 'mensalidade')
+                ),
+                'overdue' => AdminMetricCards::currency(
+                    'Atrasadas',
+                    (float) $summarySnapshot->where('status', InvoiceStatus::Overdue)->sum('amount'),
+                    AdminMetricCards::competencyContext($billingPeriod, $selectedBranch),
+                    AdminMetricCards::detailCount($summarySnapshot->where('status', InvoiceStatus::Overdue)->count(), 'mensalidade')
+                ),
+            ],
         ]);
     }
 
@@ -46,7 +102,7 @@ class FinanceController extends Controller
             $request->user()
         );
 
-        return redirect()->route('finance.index')->with('status', 'Mensalidades geradas com sucesso.');
+        return redirect()->back()->with('status', 'Mensalidades geradas com sucesso.');
     }
 
     public function markPaid(MarkInvoicePaidRequest $request, MembershipInvoice $membershipInvoice, BillingService $billingService)
@@ -60,6 +116,6 @@ class FinanceController extends Controller
             $request->validated('notes')
         );
 
-        return redirect()->route('finance.index')->with('status', 'Pagamento baixado com sucesso.');
+        return redirect()->back()->with('status', 'Pagamento baixado com sucesso.');
     }
 }

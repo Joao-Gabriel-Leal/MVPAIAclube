@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\MembershipStatus;
+use App\Enums\ProposalOrigin;
 use App\Models\Branch;
 use App\Models\Member;
 use App\Models\Plan;
@@ -21,6 +22,7 @@ class MemberFactory extends Factory
             'primary_branch_id' => Branch::factory(),
             'plan_id' => Plan::factory(),
             'status' => MembershipStatus::Active,
+            'source' => ProposalOrigin::Manual,
             'custom_monthly_fee' => null,
             'approved_at' => now(),
             'approved_by_user_id' => null,

@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Support\Str;
-
 return [
 
     /*
@@ -127,10 +125,8 @@ return [
     |
     */
 
-    'cookie' => env(
-        'SESSION_COOKIE',
-        Str::slug((string) env('APP_NAME', 'laravel')).'-session'
-    ),
+    // Keep the session cookie stable even when APP_NAME/branding changes locally.
+    'cookie' => env('SESSION_COOKIE', 'clube-aabb-session'),
 
     /*
     |--------------------------------------------------------------------------

@@ -19,6 +19,8 @@ class ReportFilterRequest extends FormRequest
             'start_date' => ['nullable', 'date'],
             'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
             'status' => ['nullable', 'string', 'max:50'],
+            'proposal_origin' => ['nullable', 'in:manual,public'],
+            'inventory_category' => ['nullable', 'string', 'max:100'],
         ];
     }
 }

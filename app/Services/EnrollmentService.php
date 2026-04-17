@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\MembershipStatus;
+use App\Enums\ProposalOrigin;
 use App\Models\Branch;
 use App\Models\Member;
 use App\Models\Plan;
@@ -27,6 +28,7 @@ class EnrollmentService
             'primary_branch_id' => $branch->id,
             'plan_id' => $plan->id,
             'status' => MembershipStatus::Pending->value,
+            'source' => ProposalOrigin::Public->value,
             'additional_branch_ids' => [],
         ]);
 

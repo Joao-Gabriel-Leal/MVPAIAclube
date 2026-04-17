@@ -25,9 +25,11 @@ class MediaAssetController extends Controller
             }
         }
 
-        return response($mediaAsset->content, 200, [
+        $content = $mediaAsset->binaryContent();
+
+        return response($content, 200, [
             'Content-Type' => $mediaAsset->mime_type,
-            'Content-Length' => (string) $mediaAsset->size_bytes,
+            'Content-Length' => (string) strlen($content),
             'Content-Disposition' => 'inline; filename="'.addslashes($mediaAsset->original_name).'"',
             'Cache-Control' => $mediaAsset->isPublic() ? 'public, max-age=86400' : 'private, max-age=3600',
             'ETag' => '"'.$mediaAsset->checksum.'"',

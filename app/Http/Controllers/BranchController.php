@@ -7,6 +7,7 @@ use App\Http\Requests\SaveBranchRequest;
 use App\Models\Branch;
 use App\Services\BillingService;
 use App\Services\BranchHubService;
+use App\Support\MaskFormatter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -30,7 +31,12 @@ class BranchController extends Controller
                 'branches' => Branch::query()->count(),
                 'active' => Branch::query()->where('is_active', true)->count(),
                 'members' => Branch::query()->withCount('members')->get()->sum('members_count'),
-                'resources' => Branch::query()->withCount('resources')->get()->sum('resources_count'),
+                'pending_members' => Branch::query()
+                    ->withCount([
+                        'members as pending_members_count' => fn ($query) => $query->where('status', 'pending'),
+                    ])
+                    ->get()
+                    ->sum('pending_members_count'),
             ],
         ]);
     }
@@ -51,10 +57,11 @@ class BranchController extends Controller
                 'planos' => 'Planos',
                 'recursos' => 'Recursos',
                 'reservas' => 'Reservas',
+                'estoque' => 'Estoque',
                 'financeiro' => 'Financeiro',
                 'relatorios' => 'Relatorios',
             ]),
-            ...$branchHubService->build($branch, $request->user(), $request->only(['start_date', 'end_date', 'status'])),
+            ...$branchHubService->build($branch, $request->user(), $request->only(['start_date', 'end_date', 'status', 'proposal_origin', 'inventory_category', 'billing_period'])),
         ]);
     }
 
@@ -74,11 +81,7 @@ class BranchController extends Controller
     {
         $this->authorize('create', Branch::class);
 
-        Branch::query()->create([
-            ...$request->validated(),
-            'slug' => Str::slug($request->validated('slug')),
-            'is_active' => (bool) $request->boolean('is_active', true),
-        ]);
+        Branch::query()->create($this->branchAttributes($request));
 
         return redirect()->route('filiais.index')->with('status', 'Filial cadastrada com sucesso.');
     }
@@ -97,19 +100,54 @@ class BranchController extends Controller
     {
         $this->authorize('update', $branch);
 
-        $branch->update([
-            ...$request->validated(),
-            'slug' => Str::slug($request->validated('slug')),
-            'is_active' => (bool) $request->boolean('is_active', true),
-        ]);
+        $branch->update($this->branchAttributes($request, $branch));
 
         return redirect()->route('filiais.index')->with('status', 'Filial atualizada com sucesso.');
     }
 
     protected function resolveTab(?string $tab): string
     {
-        $allowedTabs = ['resumo', 'planos', 'recursos', 'reservas', 'financeiro', 'relatorios'];
+        $allowedTabs = ['resumo', 'planos', 'recursos', 'reservas', 'estoque', 'financeiro', 'relatorios'];
 
         return in_array($tab, $allowedTabs, true) ? $tab : 'resumo';
+    }
+
+    protected function branchAttributes(SaveBranchRequest $request, ?Branch $branch = null): array
+    {
+        return [
+            'name' => $request->validated('name'),
+            'slug' => Str::slug($request->validated('slug')),
+            'type' => $request->validated('type'),
+            'email' => $request->validated('email'),
+            'phone' => $request->validated('phone'),
+            'address' => $request->validated('address'),
+            'monthly_fee_default' => $request->validated('monthly_fee_default'),
+            'is_active' => (bool) $request->boolean('is_active', true),
+            'settings' => $this->mergePublicBranchSettings($branch, (array) $request->validated('settings', [])),
+        ];
+    }
+
+    protected function mergePublicBranchSettings(?Branch $branch, array $settings): array
+    {
+        $existing = (array) ($branch?->settings ?? []);
+        $managedSettings = [
+            'city' => trim((string) ($settings['city'] ?? '')),
+            'summary' => trim((string) ($settings['summary'] ?? '')),
+            'public_phone' => MaskFormatter::digits((string) ($settings['public_phone'] ?? '')),
+            'public_whatsapp' => MaskFormatter::digits((string) ($settings['public_whatsapp'] ?? '')),
+            'public_hours' => trim((string) ($settings['public_hours'] ?? '')),
+        ];
+
+        foreach ($managedSettings as $key => $value) {
+            if ($value !== null && $value !== '') {
+                $existing[$key] = $value;
+
+                continue;
+            }
+
+            unset($existing[$key]);
+        }
+
+        return $existing;
     }
 }

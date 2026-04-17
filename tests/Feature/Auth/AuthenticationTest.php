@@ -34,11 +34,27 @@ class AuthenticationTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->post('/login', [
+        $response = $this->from('/login')->post('/login', [
             'email' => $user->email,
             'password' => 'wrong-password',
         ]);
 
+        $response->assertRedirect('/login');
+        $response->assertSessionHasErrors(['password']);
+        $response->assertSessionHas('errors', fn ($errors) => $errors->getBag('default')->first('password') === __('auth.password_incorrect'));
+        $this->assertGuest();
+    }
+
+    public function test_users_can_not_authenticate_with_unknown_email(): void
+    {
+        $response = $this->from('/login')->post('/login', [
+            'email' => 'naoexiste@clube.test',
+            'password' => 'password',
+        ]);
+
+        $response->assertRedirect('/login');
+        $response->assertSessionHasErrors(['email']);
+        $response->assertSessionHas('errors', fn ($errors) => $errors->getBag('default')->first('email') === __('auth.email_not_found'));
         $this->assertGuest();
     }
 

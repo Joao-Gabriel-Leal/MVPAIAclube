@@ -26,7 +26,6 @@ export function initializeReservationCalendars(root = document) {
         const slotGrid = container.querySelector('[data-slot-grid]');
         const slotStatus = container.querySelector('[data-slot-status]');
         const slotStage = container.querySelector('[data-slot-stage]');
-        const summary = container.querySelector('[data-selection-summary]');
         const prevButton = container.querySelector('[data-calendar-prev]');
         const nextButton = container.querySelector('[data-calendar-next]');
         const today = container.dataset.today || formatDate(new Date());
@@ -58,46 +57,36 @@ export function initializeReservationCalendars(root = document) {
             }
 
             const cells = buildCalendarCells(state.activeMonth);
-            const gridMarkup = cells.map((date) => renderCalendarCell(date)).join('');
-
-            calendarGrid.innerHTML = `${renderWeekdays()}${gridMarkup}`;
+            calendarGrid.innerHTML = `${renderWeekdays()}${cells.map((date) => renderCalendarCell(date)).join('')}`;
         }
 
         function renderCalendarCell(date) {
             const inMonth = isSameMonth(date, state.activeMonth);
+            const isoDate = formatDate(date);
+            const day = inMonth ? state.monthDays[isoDate] : null;
+            const isInteractive = inMonth && canSelectDay(day);
+            const isSelected = state.selectedDate === isoDate;
+            const isToday = isoDate === today;
 
             if (!inMonth) {
                 return `
-                    <div class="calendar-day is-other-month is-disabled" aria-hidden="true">
-                        <div class="calendar-day-content">
-                            <span class="calendar-day-number">${date.getDate()}</span>
-                        </div>
+                    <div class="calendar-day is-other-month" aria-hidden="true">
+                        <span class="calendar-day-number">${date.getDate()}</span>
                     </div>
                 `;
             }
 
-            const isoDate = formatDate(date);
-            const day = state.monthDays[isoDate];
-            const stateClass = resolveCalendarClass(day);
-            const disabled = !day || ['past', 'unavailable'].includes(day.state);
-            const isSelected = state.selectedDate === isoDate;
-            const isToday = isoDate === today;
-            const label = describeDayState(day);
-            const caption = describeDayCaption(day, isToday);
-
             return `
                 <button
                     type="button"
-                    class="calendar-day ${stateClass} ${isSelected ? 'is-selected' : ''} ${isToday ? 'is-today' : ''}"
+                    class="calendar-day ${isInteractive ? 'is-available' : 'is-disabled'} ${isSelected ? 'is-selected' : ''} ${isToday ? 'is-today' : ''}"
                     data-calendar-day="${isoDate}"
-                    ${disabled ? 'disabled' : ''}
-                    aria-label="${formatFullDate(date)}${label ? `, ${label}` : ''}"
+                    data-day-state="${day?.state ?? 'unavailable'}"
+                    ${isInteractive ? '' : 'disabled'}
+                    aria-pressed="${isSelected ? 'true' : 'false'}"
+                    aria-label="${formatFullDate(date)}${describeDayState(day)}"
                 >
-                    <div class="calendar-day-content">
-                        <span class="calendar-day-number">${date.getDate()}</span>
-                        <span class="calendar-day-caption">${caption}</span>
-                    </div>
-                    ${day ? '<span class="calendar-day-dot"></span>' : ''}
+                    <span class="calendar-day-number">${date.getDate()}</span>
                 </button>
             `;
         }
@@ -107,13 +96,13 @@ export function initializeReservationCalendars(root = document) {
             slotStage?.toggleAttribute('data-loading', state.loadingSlots);
 
             if (!resourceSelect.value) {
-                slotStatus.textContent = 'Selecione um recurso para abrir os horarios.';
+                slotStatus.textContent = 'Selecione um recurso para ver os horarios.';
                 slotGrid.innerHTML = '';
                 return;
             }
 
             if (!state.selectedDate) {
-                slotStatus.textContent = 'Escolha um dia no calendario para ver os horarios.';
+                slotStatus.textContent = 'Escolha uma data com horarios disponiveis.';
                 slotGrid.innerHTML = '';
                 return;
             }
@@ -125,22 +114,12 @@ export function initializeReservationCalendars(root = document) {
             }
 
             if (!state.slots.length) {
-                slotStatus.textContent = 'Nenhum horario configurado para o dia selecionado.';
-                slotGrid.innerHTML = `
-                    <div class="slot-empty-state">
-                        <strong>Sem slots disponiveis</strong>
-                        <span>Tente outra data ou altere o recurso selecionado.</span>
-                    </div>
-                `;
+                slotStatus.textContent = 'Nenhum horario disponivel para esta data.';
+                slotGrid.innerHTML = '';
                 return;
             }
 
-            const availableCount = state.slots.filter((slot) => slot.available).length;
-
-            slotStatus.textContent = availableCount
-                ? `${availableCount} horario${availableCount > 1 ? 's' : ''} livre${availableCount > 1 ? 's' : ''} em ${formatCompactDate(state.selectedDate)}.`
-                : `Nao ha horarios livres em ${formatCompactDate(state.selectedDate)}.`;
-
+            slotStatus.textContent = formatCompactDate(state.selectedDate);
             slotGrid.innerHTML = state.slots.map((slot) => {
                 const key = `${slot.start_time}-${slot.end_time}`;
                 const isSelected = key === state.selectedSlotKey;
@@ -150,50 +129,13 @@ export function initializeReservationCalendars(root = document) {
                         type="button"
                         class="slot-button ${isSelected ? 'is-selected' : ''}"
                         data-slot="${key}"
-                        ${slot.available ? '' : 'disabled'}
+                        aria-pressed="${isSelected ? 'true' : 'false'}"
+                        aria-label="${isSelected ? `Horario ${slot.start_time} selecionado` : `Selecionar horario ${slot.start_time}`}"
                     >
-                        <div class="slot-button-row">
-                            <div>
-                                <div class="slot-time">${slot.start_time}</div>
-                                <div class="slot-duration">Ate ${slot.end_time}</div>
-                            </div>
-                            <span class="slot-badge ${slot.available ? 'is-available' : 'is-unavailable'}">
-                                ${slot.available ? (isSelected ? 'Selecionado' : 'Disponivel') : 'Indisponivel'}
-                            </span>
-                        </div>
-                        <div class="slot-meta">
-                            ${slot.available ? 'Toque para reservar este horario.' : 'Este horario ja foi ocupado.'}
-                        </div>
+                        ${slot.start_time}
                     </button>
                 `;
             }).join('');
-        }
-
-        function renderSummary() {
-            const option = resourceSelect.options[resourceSelect.selectedIndex];
-
-            summary.innerHTML = `
-                <div class="grid gap-4 md:grid-cols-3">
-                    <div>
-                        <div class="summary-label">Recurso</div>
-                        <div class="summary-value">${option ? option.textContent.trim() : 'Selecione'}</div>
-                    </div>
-                    <div>
-                        <div class="summary-label">Data</div>
-                        <div class="summary-value">${state.selectedDate ? formatDisplayDate(state.selectedDate) : 'Escolha um dia'}</div>
-                    </div>
-                    <div>
-                        <div class="summary-label">Horario</div>
-                        <div class="summary-value">${selectedSlotLabel() || 'Escolha um horario'}</div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function selectedSlotLabel() {
-            const slot = state.slots.find(({ start_time, end_time }) => `${start_time}-${end_time}` === state.selectedSlotKey);
-
-            return slot ? `${slot.start_time} - ${slot.end_time}` : '';
         }
 
         function syncSubmitButton() {
@@ -201,12 +143,12 @@ export function initializeReservationCalendars(root = document) {
                 return;
             }
 
-            const ready = Boolean(state.selectedDate && state.selectedSlotKey && !state.loadingSlots && !state.loadingMonth);
+            const selectedSlot = state.slots.find((slot) => `${slot.start_time}-${slot.end_time}` === state.selectedSlotKey);
+            const ready = Boolean(state.selectedDate && selectedSlot && !state.loadingSlots && !state.loadingMonth);
 
             submitButton.disabled = !ready;
-            submitButton.textContent = ready
-                ? `Confirmar ${state.slots.find((slot) => `${slot.start_time}-${slot.end_time}` === state.selectedSlotKey)?.start_time ?? ''}`
-                : 'Selecione um horario';
+            submitButton.classList.toggle('hidden', !ready);
+            submitButton.textContent = ready ? `Confirmar ${selectedSlot.start_time}` : 'Confirmar horario';
         }
 
         function clearSlotSelection(keepSlots = false) {
@@ -219,7 +161,6 @@ export function initializeReservationCalendars(root = document) {
             }
 
             renderSlots();
-            renderSummary();
             syncSubmitButton();
         }
 
@@ -227,9 +168,11 @@ export function initializeReservationCalendars(root = document) {
             if (!resourceSelect.value) {
                 state.monthDays = {};
                 state.loadingMonth = false;
+                state.selectedDate = '';
+                dateInput.value = '';
                 renderCalendar();
-                calendarStatus.textContent = 'Selecione um recurso para carregar a disponibilidade.';
                 clearSlotSelection();
+                calendarStatus.textContent = 'Selecione um recurso para exibir os dias disponiveis.';
                 return;
             }
 
@@ -258,19 +201,20 @@ export function initializeReservationCalendars(root = document) {
 
                 state.monthDays = Object.fromEntries((data.days || []).map((day) => [day.date, day]));
                 state.loadingMonth = false;
+
+                const selectedDay = state.selectedDate ? state.monthDays[state.selectedDate] : null;
+
+                if (state.selectedDate && !canSelectDay(selectedDay)) {
+                    state.selectedDate = '';
+                    dateInput.value = '';
+                    clearSlotSelection();
+                }
+
                 renderCalendar();
-                calendarStatus.textContent = 'Selecione uma data destacada para continuar.';
+                calendarStatus.textContent = '';
 
-                if (state.selectedDate) {
-                    const selectedDay = state.monthDays[state.selectedDate];
-
-                    if (!selectedDay || ['past', 'unavailable'].includes(selectedDay.state)) {
-                        state.selectedDate = '';
-                        dateInput.value = '';
-                        clearSlotSelection();
-                    } else {
-                        await loadSlots(state.selectedDate);
-                    }
+                if (state.selectedDate && canSelectDay(selectedDay)) {
+                    await loadSlots(state.selectedDate);
                 } else {
                     clearSlotSelection();
                 }
@@ -281,9 +225,11 @@ export function initializeReservationCalendars(root = document) {
 
                 state.loadingMonth = false;
                 state.monthDays = {};
+                state.selectedDate = '';
+                dateInput.value = '';
                 renderCalendar();
-                calendarStatus.textContent = error.message;
                 clearSlotSelection();
+                calendarStatus.textContent = error.message;
             } finally {
                 syncSubmitButton();
             }
@@ -291,6 +237,12 @@ export function initializeReservationCalendars(root = document) {
 
         async function loadSlots(date) {
             if (!resourceSelect.value || !date) {
+                return;
+            }
+
+            const day = state.monthDays[date];
+
+            if (!canSelectDay(day)) {
                 return;
             }
 
@@ -302,7 +254,7 @@ export function initializeReservationCalendars(root = document) {
             state.loadingSlots = true;
             state.selectedDate = date;
             dateInput.value = date;
-            calendarStatus.textContent = `${formatCompactDate(date)} selecionado. Carregando horarios...`;
+            calendarStatus.textContent = 'Carregando horarios do dia...';
             clearSlotSelection();
             renderCalendar();
             renderSlots();
@@ -326,12 +278,21 @@ export function initializeReservationCalendars(root = document) {
                 }
 
                 state.loadingSlots = false;
-                state.slots = data.slots || [];
-                calendarStatus.textContent = `${formatCompactDate(date)} selecionado. Escolha um horario abaixo.`;
+                state.slots = (data.slots || []).filter((slot) => slot.available);
 
-                if (preservedKey && state.slots.some((slot) => `${slot.start_time}-${slot.end_time}` === preservedKey && slot.available)) {
+                if (!state.slots.length) {
+                    state.selectedDate = '';
+                    dateInput.value = '';
+                    clearSlotSelection();
+                    renderCalendar();
+                    calendarStatus.textContent = 'Nenhum horario foi encontrado nessa data. Escolha outro dia marcado.';
+                    return;
+                }
+
+                calendarStatus.textContent = '';
+
+                if (preservedKey && state.slots.some((slot) => `${slot.start_time}-${slot.end_time}` === preservedKey)) {
                     state.selectedSlotKey = preservedKey;
-
                     const selectedSlot = state.slots.find((slot) => `${slot.start_time}-${slot.end_time}` === preservedKey);
 
                     if (selectedSlot) {
@@ -341,7 +302,6 @@ export function initializeReservationCalendars(root = document) {
                 }
 
                 renderSlots();
-                renderSummary();
                 syncSubmitButton();
             } catch (error) {
                 if (requestId !== state.dayRequestId) {
@@ -349,16 +309,18 @@ export function initializeReservationCalendars(root = document) {
                 }
 
                 state.loadingSlots = false;
+                state.selectedDate = '';
+                dateInput.value = '';
                 state.slots = [];
                 slotStatus.textContent = error.message;
                 slotGrid.innerHTML = '';
-                renderSummary();
+                renderCalendar();
                 syncSubmitButton();
             }
         }
 
         function selectSlot(key) {
-            const slot = state.slots.find(({ start_time, end_time, available }) => `${start_time}-${end_time}` === key && available);
+            const slot = state.slots.find(({ start_time, end_time }) => `${start_time}-${end_time}` === key);
 
             if (!slot) {
                 return;
@@ -368,14 +330,13 @@ export function initializeReservationCalendars(root = document) {
             startInput.value = slot.start_time;
             endInput.value = slot.end_time;
             renderSlots();
-            renderSummary();
             syncSubmitButton();
         }
 
         container.addEventListener('click', async (event) => {
             const dayButton = event.target.closest('[data-calendar-day]');
 
-            if (dayButton) {
+            if (dayButton && !dayButton.disabled) {
                 await loadSlots(dayButton.dataset.calendarDay);
                 return;
             }
@@ -406,33 +367,21 @@ export function initializeReservationCalendars(root = document) {
         });
 
         resourceSelect?.addEventListener('change', async () => {
+            state.selectedDate = '';
+            dateInput.value = '';
+            clearSlotSelection();
             await loadMonth();
         });
 
-        renderSummary();
+        renderCalendar();
+        renderSlots();
         syncSubmitButton();
         loadMonth();
     });
 }
 
-function resolveCalendarClass(day) {
-    if (!day) {
-        return 'is-disabled';
-    }
-
-    if (day.state === 'available') {
-        return 'is-available';
-    }
-
-    if (day.state === 'partial') {
-        return 'is-partial';
-    }
-
-    if (day.state === 'unavailable') {
-        return 'is-unavailable is-disabled';
-    }
-
-    return 'is-disabled';
+function canSelectDay(day) {
+    return Boolean(day && ['available', 'partial'].includes(day.state) && Number(day.available_slots_count) > 0);
 }
 
 function describeDayState(day) {
@@ -440,39 +389,15 @@ function describeDayState(day) {
         return '';
     }
 
-    if (day.state === 'available') {
-        return `${day.available_slots_count} horarios disponiveis`;
+    if (day.state === 'available' || day.state === 'partial') {
+        return `, ${day.available_slots_count} horarios disponiveis`;
     }
 
-    if (day.state === 'partial') {
-        return `${day.available_slots_count} horarios ainda livres`;
+    if (day.state === 'past') {
+        return ', dia passado';
     }
 
-    if (day.state === 'unavailable') {
-        return 'dia indisponivel';
-    }
-
-    return 'dia passado';
-}
-
-function describeDayCaption(day, isToday) {
-    if (!day) {
-        return isToday ? 'Hoje' : 'Sem agenda';
-    }
-
-    if (day.state === 'available') {
-        return day.available_slots_count > 0 ? `${day.available_slots_count} livres` : 'Livre';
-    }
-
-    if (day.state === 'partial') {
-        return `${day.available_slots_count} livres`;
-    }
-
-    if (day.state === 'unavailable') {
-        return 'Fechado';
-    }
-
-    return isToday ? 'Hoje' : 'Encerrado';
+    return ', sem horarios disponiveis';
 }
 
 function renderCalendarSkeleton() {
@@ -482,13 +407,7 @@ function renderCalendarSkeleton() {
 }
 
 function renderSlotSkeletons() {
-    return Array.from({ length: 6 }, () => `
-        <div class="slot-skeleton shimmer" aria-hidden="true">
-            <div class="slot-skeleton-line slot-skeleton-line-lg"></div>
-            <div class="slot-skeleton-line slot-skeleton-line-sm"></div>
-            <div class="slot-skeleton-line slot-skeleton-line-md"></div>
-        </div>
-    `).join('');
+    return Array.from({ length: 5 }, () => '<div class="slot-skeleton shimmer" aria-hidden="true"></div>').join('');
 }
 
 function buildCalendarCells(activeMonth) {
@@ -506,14 +425,9 @@ function buildCalendarCells(activeMonth) {
 function formatMonthLabel(date) {
     const formatter = new Intl.DateTimeFormat('pt-BR', {
         month: 'long',
-        year: 'numeric',
     });
 
-    return formatter.format(date);
-}
-
-function formatDisplayDate(isoDate) {
-    return formatFullDate(createDateFromIso(isoDate));
+    return `${formatter.format(date)} ${date.getFullYear()}`;
 }
 
 function formatCompactDate(isoDate) {

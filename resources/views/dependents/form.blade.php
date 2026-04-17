@@ -6,6 +6,10 @@
         </div>
     </x-slot>
 
+    @php
+        $dependentUser = $dependent->user;
+    @endphp
+
     <form method="POST" action="{{ $dependent->exists ? route('dependentes.update', $dependent) : route('dependentes.store') }}" class="panel p-8 space-y-5">
         @csrf
         @if ($dependent->exists)
@@ -35,23 +39,23 @@
             </div>
             <div class="md:col-span-2">
                 <label class="field-label" for="name">Nome completo</label>
-                <input class="field-input" id="name" name="name" value="{{ old('name', $dependent->user->name ?? '') }}" required />
+                <input class="field-input" id="name" name="name" value="{{ old('name', $dependentUser?->name ?? '') }}" required />
             </div>
             <div>
                 <label class="field-label" for="cpf">CPF</label>
-                <input class="field-input" id="cpf" name="cpf" value="{{ old('cpf', $dependent->user->cpf ?? '') }}" required />
+                <input class="field-input" id="cpf" name="cpf" value="{{ old('cpf', $dependentUser?->cpf ?? '') }}" required />
             </div>
             <div>
                 <label class="field-label" for="birth_date">Data de nascimento</label>
-                <input class="field-input" id="birth_date" type="date" name="birth_date" value="{{ old('birth_date', optional($dependent->user->birth_date)->format('Y-m-d')) }}" required />
+                <input class="field-input" id="birth_date" type="date" name="birth_date" value="{{ old('birth_date', optional($dependentUser?->birth_date)->format('Y-m-d')) }}" required />
             </div>
             <div>
                 <label class="field-label" for="email">E-mail</label>
-                <input class="field-input" id="email" type="email" name="email" value="{{ old('email', $dependent->user->email ?? '') }}" required />
+                <input class="field-input" id="email" type="email" name="email" value="{{ old('email', $dependentUser?->email ?? '') }}" required />
             </div>
             <div>
                 <label class="field-label" for="phone">Telefone</label>
-                <input class="field-input" id="phone" name="phone" value="{{ old('phone', $dependent->user->phone ?? '') }}" required />
+                <input class="field-input" id="phone" name="phone" value="{{ old('phone', $dependentUser?->phone ?? '') }}" required />
             </div>
             <div>
                 <label class="field-label" for="password">Senha {{ $dependent->exists ? '(opcional)' : '' }}</label>

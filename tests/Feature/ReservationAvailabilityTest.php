@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Enums\ReservationStatus;
 use App\Models\Branch;
 use App\Models\ClubResource;
+use App\Models\Dependent;
 use App\Models\Member;
 use App\Models\Plan;
 use App\Models\Reservation;
@@ -190,7 +191,165 @@ class ReservationAvailabilityTest extends TestCase
         $this->assertSame(1, Reservation::query()->count());
     }
 
-    protected function createActiveMember(Branch $branch, array $planOverrides = []): Member
+    public function test_member_reservation_create_page_only_lists_resources_from_linked_branches(): void
+    {
+        $primaryBranch = Branch::factory()->create(['name' => 'Centro']);
+        $additionalBranch = Branch::factory()->create(['name' => 'Lago']);
+        $outsideBranch = Branch::factory()->create(['name' => 'Serra']);
+        $user = User::factory()->create();
+        $member = $this->createActiveMember($primaryBranch, user: $user);
+        $member->additionalBranches()->sync([$additionalBranch->id]);
+
+        ClubResource::factory()->create([
+            'branch_id' => $primaryBranch->id,
+            'name' => 'Quadra Centro',
+        ]);
+        ClubResource::factory()->create([
+            'branch_id' => $additionalBranch->id,
+            'name' => 'Salao Lago',
+        ]);
+        ClubResource::factory()->create([
+            'branch_id' => $outsideBranch->id,
+            'name' => 'Piscina Serra',
+        ]);
+
+        $this->actingAs($user)
+            ->get('/reservas/create')
+            ->assertOk()
+            ->assertSee('Quadra Centro - Centro')
+            ->assertSee('Salao Lago - Lago')
+            ->assertDontSee('Piscina Serra - Serra');
+    }
+
+    public function test_dependent_reservation_create_page_only_lists_resources_from_own_branch(): void
+    {
+        $memberBranch = Branch::factory()->create(['name' => 'Centro']);
+        $dependentBranch = Branch::factory()->create(['name' => 'Lago']);
+        $outsideBranch = Branch::factory()->create(['name' => 'Serra']);
+        $member = $this->createActiveMember($memberBranch);
+        $user = User::factory()->dependent()->create();
+
+        Dependent::factory()->create([
+            'user_id' => $user->id,
+            'member_id' => $member->id,
+            'branch_id' => $dependentBranch->id,
+        ]);
+
+        ClubResource::factory()->create([
+            'branch_id' => $memberBranch->id,
+            'name' => 'Quadra Centro',
+        ]);
+        ClubResource::factory()->create([
+            'branch_id' => $dependentBranch->id,
+            'name' => 'Salao Lago',
+        ]);
+        ClubResource::factory()->create([
+            'branch_id' => $outsideBranch->id,
+            'name' => 'Piscina Serra',
+        ]);
+
+        $this->actingAs($user)
+            ->get('/reservas/create')
+            ->assertOk()
+            ->assertSee('Salao Lago - Lago')
+            ->assertDontSee('Quadra Centro - Centro')
+            ->assertDontSee('Piscina Serra - Serra');
+    }
+
+    public function test_admin_matrix_can_still_filter_reservation_resources_by_branch_query(): void
+    {
+        $admin = User::factory()->adminMatrix()->create();
+        $firstBranch = Branch::factory()->create(['name' => 'Centro']);
+        $secondBranch = Branch::factory()->create(['name' => 'Lago']);
+
+        ClubResource::factory()->create([
+            'branch_id' => $firstBranch->id,
+            'name' => 'Quadra Centro',
+        ]);
+        ClubResource::factory()->create([
+            'branch_id' => $secondBranch->id,
+            'name' => 'Salao Lago',
+        ]);
+
+        $this->actingAs($admin)
+            ->get("/reservas/create?branch_id={$secondBranch->id}")
+            ->assertOk()
+            ->assertSee('Salao Lago - Lago')
+            ->assertDontSee('Quadra Centro - Centro');
+    }
+
+    public function test_member_cannot_access_daily_availability_for_a_resource_outside_linked_branches(): void
+    {
+        $linkedBranch = Branch::factory()->create();
+        $outsideBranch = Branch::factory()->create();
+        $user = User::factory()->create();
+        $member = $this->createActiveMember($linkedBranch, user: $user);
+        $member->additionalBranches()->sync([]);
+        $resource = ClubResource::factory()->create([
+            'branch_id' => $outsideBranch->id,
+        ]);
+
+        $this->actingAs($user)
+            ->getJson("/api/v1/resources/{$resource->id}/availability?date=2026-04-20")
+            ->assertForbidden();
+    }
+
+    public function test_dependent_cannot_access_monthly_availability_for_a_resource_outside_own_branch(): void
+    {
+        $memberBranch = Branch::factory()->create();
+        $dependentBranch = Branch::factory()->create();
+        $outsideBranch = Branch::factory()->create();
+        $member = $this->createActiveMember($memberBranch);
+        $user = User::factory()->dependent()->create();
+
+        Dependent::factory()->create([
+            'user_id' => $user->id,
+            'member_id' => $member->id,
+            'branch_id' => $dependentBranch->id,
+        ]);
+
+        $resource = ClubResource::factory()->create([
+            'branch_id' => $outsideBranch->id,
+        ]);
+
+        $this->actingAs($user)
+            ->getJson("/api/v1/resources/{$resource->id}/availability/month?month=2026-04")
+            ->assertForbidden();
+    }
+
+    public function test_member_cannot_create_a_reservation_for_a_resource_outside_linked_branches(): void
+    {
+        $linkedBranch = Branch::factory()->create();
+        $outsideBranch = Branch::factory()->create();
+        $user = User::factory()->create();
+        $this->createActiveMember($linkedBranch, [
+            'guest_limit_per_reservation' => 2,
+        ], $user);
+        $resource = ClubResource::factory()->create([
+            'branch_id' => $outsideBranch->id,
+        ]);
+
+        $response = $this
+            ->from('/reservas/create')
+            ->actingAs($user)
+            ->post('/reservas', [
+                'club_resource_id' => $resource->id,
+                'reservation_date' => '2026-04-20',
+                'start_time' => '09:00',
+                'end_time' => '10:00',
+                'guest_count' => 0,
+            ]);
+
+        $response
+            ->assertRedirect('/reservas/create')
+            ->assertSessionHasErrors([
+                'reservation' => 'Voce nao pode reservar recursos fora das filiais vinculadas ao seu cadastro.',
+            ]);
+
+        $this->assertSame(0, Reservation::query()->count());
+    }
+
+    protected function createActiveMember(Branch $branch, array $planOverrides = [], ?User $user = null): Member
     {
         $plan = Plan::factory()->create(array_merge([
             'guest_limit_per_reservation' => 2,
@@ -198,6 +357,7 @@ class ReservationAvailabilityTest extends TestCase
         ], $planOverrides));
 
         return Member::factory()->create([
+            'user_id' => $user?->id ?? User::factory(),
             'primary_branch_id' => $branch->id,
             'plan_id' => $plan->id,
         ]);

@@ -21,7 +21,11 @@ class MemberController extends Controller
         $user = $request->user();
         $search = trim((string) $request->string('q'));
         $digitsSearch = $this->normalizeDigits($search);
-        $status = $request->string('status')->toString() ?: null;
+        $status = $this->resolveAdministrativeStatus($request->string('status')->toString());
+        $allowedStatuses = [
+            MembershipStatus::Active->value,
+            MembershipStatus::Cancelled->value,
+        ];
         $selectedBranchId = $user->isAdminBranch()
             ? $user->branch_id
             : ($user->isMember()
@@ -32,7 +36,8 @@ class MemberController extends Controller
 
         $memberQuery = Member::query()
             ->with(['user', 'plan', 'primaryBranch', 'additionalBranches'])
-            ->withCount('dependents');
+            ->withCount('dependents')
+            ->whereIn('status', $allowedStatuses);
 
         if ($user->isAdminBranch()) {
             $memberQuery->where(function ($builder) use ($user) {
@@ -46,7 +51,7 @@ class MemberController extends Controller
             $memberQuery->whereKey($user->dependent?->member_id);
         }
 
-        if ($status) {
+        if ($status !== 'base') {
             $memberQuery->where('status', $status);
         }
 
@@ -69,7 +74,11 @@ class MemberController extends Controller
         }
 
         $dependentQuery = Dependent::query()
-            ->with(['user', 'member.user', 'member.plan', 'branch']);
+            ->with(['user', 'member.user', 'member.plan', 'branch'])
+            ->whereIn('status', [
+                \App\Enums\DependentStatus::Active->value,
+                \App\Enums\DependentStatus::Cancelled->value,
+            ]);
 
         if ($user->isAdminBranch()) {
             $dependentQuery->where('branch_id', $user->branch_id);
@@ -83,7 +92,7 @@ class MemberController extends Controller
             $dependentQuery->where('branch_id', $selectedBranchId);
         }
 
-        if ($status) {
+        if ($status !== 'base') {
             $dependentQuery->where('status', $status);
         }
 
@@ -118,14 +127,19 @@ class MemberController extends Controller
             'members' => $memberQuery->latest()->paginate(12)->withQueryString(),
             'dependents' => $dependentQuery->latest()->paginate(12, ['*'], 'dependents_page')->withQueryString(),
             'branches' => $branches,
-            'statuses' => MembershipStatus::cases(),
+            'statusOptions' => collect([
+                ['value' => MembershipStatus::Active->value, 'label' => 'Ativos'],
+                ['value' => MembershipStatus::Cancelled->value, 'label' => 'Cancelados'],
+                ['value' => 'base', 'label' => 'Base completa'],
+            ]),
+            'statusFilter' => $status,
             'search' => $search,
             'selectedBranch' => $selectedBranchId ? Branch::query()->find($selectedBranchId) : null,
             'summary' => [
                 'members' => (clone $memberQuery)->count(),
                 'dependents' => (clone $dependentQuery)->count(),
                 'branches' => $selectedBranchId ? 1 : max($branches->count(), 1),
-                'hasFilters' => $search !== '' || $status !== null || $request->filled('branch_id'),
+                'hasFilters' => $search !== '' || $status !== MembershipStatus::Active->value || $request->filled('branch_id'),
             ],
         ]);
     }
@@ -214,5 +228,14 @@ class MemberController extends Controller
     protected function normalizeDigits(string $value): string
     {
         return preg_replace('/\D+/', '', $value) ?? '';
+    }
+
+    protected function resolveAdministrativeStatus(?string $status): string
+    {
+        return match ($status) {
+            MembershipStatus::Cancelled->value => MembershipStatus::Cancelled->value,
+            'base' => 'base',
+            default => MembershipStatus::Active->value,
+        };
     }
 }

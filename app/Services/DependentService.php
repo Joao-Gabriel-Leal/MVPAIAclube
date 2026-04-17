@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\DependentStatus;
+use App\Enums\ProposalOrigin;
 use App\Enums\UserRole;
 use App\Models\Dependent;
 use App\Models\Member;
@@ -44,6 +45,7 @@ class DependentService
                 'branch_id' => $data['branch_id'] ?? $member->primary_branch_id,
                 'relationship' => $data['relationship'],
                 'status' => DependentStatus::Pending,
+                'source' => ProposalOrigin::Manual->value,
             ]);
 
             $this->auditService->log($actor, 'dependent.created', $dependent);

@@ -52,6 +52,16 @@ class ClubResource extends Model
         return $this->hasMany(Reservation::class);
     }
 
+    public function inventoryItems()
+    {
+        return $this->hasMany(InventoryItem::class, 'club_resource_id');
+    }
+
+    public function inventoryMovements()
+    {
+        return $this->hasMany(InventoryMovement::class, 'club_resource_id');
+    }
+
     public function plans()
     {
         return $this->belongsToMany(Plan::class, 'plan_resource');

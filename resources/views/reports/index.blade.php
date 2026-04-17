@@ -2,19 +2,13 @@
     <x-slot name="header">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div class="max-w-4xl">
-                <div class="section-title">Analitico gerencial</div>
-                <h1 class="display-title mt-3">Relatorios com leitura mais executiva</h1>
-                <p class="lead-text mt-3">
-                    A area de relatorios agora prioriza comparacao visual, filtros claros e graficos reais para acompanhar operacao, base social, reservas e faturamento.
-                </p>
+                <div class="section-title">Relatorios</div>
+                <h1 class="display-title mt-3">Indicadores</h1>
             </div>
 
             <div class="context-card max-w-md">
                 <div class="nav-section-label">Escopo da analise</div>
                 <div class="mt-1 text-base font-bold text-slate-900">{{ $reportData['selectedBranch']?->name ?? 'Visao consolidada de filiais' }}</div>
-                <p class="mt-1 text-sm text-slate-600">
-                    {{ auth()->user()->isAdminBranch() ? 'Seu perfil esta fixado na propria filial, sem mistura com outras unidades.' : 'Selecione uma filial para descer ao detalhe ou mantenha a visao consolidada da matriz.' }}
-                </p>
             </div>
         </div>
     </x-slot>
@@ -23,7 +17,7 @@
     @php($chartPrefix = 'reports-main')
 
     <div class="panel p-6">
-        <form method="GET" class="grid gap-4 xl:grid-cols-[1fr_1fr_1fr_1fr_auto]">
+        <form method="GET" class="grid gap-4 xl:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto]">
             @if (auth()->user()->isAdminMatrix())
                 <div>
                     <label class="field-label" for="branch_id">Filial</label>
@@ -59,33 +53,46 @@
                     @endforeach
                 </select>
             </div>
+            <div>
+                <label class="field-label" for="proposal_origin">Origem da proposta</label>
+                <select class="field-select" id="proposal_origin" name="proposal_origin">
+                    <option value="">Todas</option>
+                    <option value="manual" @selected(($reportData['filters']['proposal_origin'] ?? null) === 'manual')>Manual</option>
+                    <option value="public" @selected(($reportData['filters']['proposal_origin'] ?? null) === 'public')>Adesao publica</option>
+                </select>
+            </div>
+            <div>
+                <label class="field-label" for="inventory_category">Categoria de estoque</label>
+                <select class="field-select" id="inventory_category" name="inventory_category">
+                    <option value="">Todas</option>
+                    @foreach ($reportData['inventoryCategories'] as $category)
+                        <option value="{{ $category }}" @selected(($reportData['filters']['inventory_category'] ?? null) === $category)>{{ $category }}</option>
+                    @endforeach
+                </select>
+            </div>
             <div class="flex items-end">
                 <button class="btn-secondary w-full" type="submit">Atualizar relatorio</button>
             </div>
         </form>
     </div>
 
-    <div class="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <div class="stat-card">
-            <div class="section-title">Associados</div>
-            <div class="mt-3 text-4xl font-bold text-slate-950">{{ $reportData['summary']['members'] }}</div>
-            <p class="mt-2 text-sm text-slate-600">Titulares dentro do recorte selecionado.</p>
-        </div>
-        <div class="stat-card">
-            <div class="section-title">Dependentes</div>
-            <div class="mt-3 text-4xl font-bold text-slate-950">{{ $reportData['summary']['dependents'] }}</div>
-            <p class="mt-2 text-sm text-slate-600">Leitura consolidada da extensao da base.</p>
-        </div>
-        <div class="stat-card">
-            <div class="section-title">Reservas</div>
-            <div class="mt-3 text-4xl font-bold text-slate-950">{{ $reportData['summary']['reservations'] }}</div>
-            <p class="mt-2 text-sm text-slate-600">Movimento operacional dentro do periodo.</p>
-        </div>
-        <div class="stat-card">
-            <div class="section-title">Receita prevista</div>
-            <div class="mt-3 text-4xl font-bold text-slate-950">R$ {{ number_format($reportData['summary']['revenue'], 2, ',', '.') }}</div>
-            <p class="mt-2 text-sm text-slate-600">Somatorio das mensalidades geradas.</p>
-        </div>
+    <div class="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        @foreach ($reportData['summaryCards'] as $card)
+            <div class="stat-card">
+                <div class="section-title">{{ $card['title'] }}</div>
+                <div class="metric-value">
+                    @if ($card['isCurrency'])
+                        R$ {{ number_format((float) $card['value'], 2, ',', '.') }}
+                    @else
+                        {{ $card['value'] }}
+                    @endif
+                </div>
+                <p class="mt-2 text-sm leading-5 text-slate-600">{{ $card['context'] }}</p>
+                @if ($card['detail'])
+                    <p class="mt-1 text-xs text-slate-500">{{ $card['detail'] }}</p>
+                @endif
+            </div>
+        @endforeach
     </div>
 
     <div class="mt-6 grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
@@ -93,47 +100,39 @@
             <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <div class="section-title">Comparativo</div>
-                    <h2 class="mt-2 text-2xl font-semibold text-slate-950">Associados por filial</h2>
+                    <h2 class="mt-2 text-xl font-semibold text-slate-950">Associados por filial</h2>
                 </div>
                 <div class="chip-brand">{{ $reportData['branches']->count() }} filial(is)</div>
             </div>
-            <div class="chart-shell mt-6">
+            <div class="chart-shell chart-shell-compact mt-6">
                 <canvas data-chart-source="{{ $chartPrefix }}-members-branch"></canvas>
             </div>
             <script id="{{ $chartPrefix }}-members-branch" type="application/json">@json($charts['membersByBranch'])</script>
         </section>
 
         <section class="panel p-6">
-            <div class="section-title">Leitura rapida</div>
-            <h2 class="mt-2 text-2xl font-semibold text-slate-950">Pontos que ajudam a decidir mais rapido</h2>
+            <div class="section-title">Resumo</div>
+            <h2 class="mt-2 text-xl font-semibold text-slate-950">Leitura rapida</h2>
             <div class="insight-list mt-6">
                 <div class="insight-row">
-                    <div>
-                        <strong>Ticket medio</strong>
-                        <div class="mt-1 text-slate-500">Valor medio das cobrancas no recorte atual.</div>
-                    </div>
+                    <strong>Ticket medio</strong>
                     <div class="text-right font-bold text-slate-950">R$ {{ number_format($reportData['summary']['averageTicket'], 2, ',', '.') }}</div>
                 </div>
                 <div class="insight-row">
-                    <div>
-                        <strong>Recursos monitorados</strong>
-                        <div class="mt-1 text-slate-500">Quantidade de recursos considerados na leitura.</div>
-                    </div>
+                    <strong>Recursos</strong>
                     <div class="text-right font-bold text-slate-950">{{ $reportData['summary']['resources'] }}</div>
                 </div>
                 <div class="insight-row">
-                    <div>
-                        <strong>Maior concentracao de dependentes</strong>
-                        <div class="mt-1 text-slate-500">Titular com maior volume de dependentes no recorte.</div>
-                    </div>
+                    <strong>Maior concentracao de dependentes</strong>
                     <div class="text-right font-bold text-slate-950">{{ $reportData['dependentsByHolder']->keys()->first() ?? 'Sem destaque' }}</div>
                 </div>
                 <div class="insight-row">
-                    <div>
-                        <strong>Plano com mais dependentes</strong>
-                        <div class="mt-1 text-slate-500">Ajuda a enxergar pressao por plano e beneficios.</div>
-                    </div>
+                    <strong>Plano com mais dependentes</strong>
                     <div class="text-right font-bold text-slate-950">{{ $reportData['dependentsByPlan']->keys()->first() ?? 'Sem destaque' }}</div>
+                </div>
+                <div class="insight-row">
+                    <strong>Consumo ligado a reservas</strong>
+                    <div class="text-right font-bold text-slate-950">{{ number_format($reportData['summary']['reservationLinkedConsumption'], 2, ',', '.') }}</div>
                 </div>
             </div>
         </section>
@@ -142,8 +141,8 @@
     <div class="mt-6 grid gap-6 xl:grid-cols-2">
         <section class="panel p-6">
             <div class="section-title">Base social</div>
-            <h2 class="mt-2 text-2xl font-semibold text-slate-950">Associados por status</h2>
-            <div class="chart-shell chart-shell-compact mt-6">
+            <h2 class="mt-2 text-xl font-semibold text-slate-950">Associados por status</h2>
+            <div class="chart-shell chart-shell-compact chart-shell-donut mt-6">
                 <canvas data-chart-source="{{ $chartPrefix }}-members-status"></canvas>
             </div>
             <script id="{{ $chartPrefix }}-members-status" type="application/json">@json($charts['membersByStatus'])</script>
@@ -151,8 +150,8 @@
 
         <section class="panel p-6">
             <div class="section-title">Financeiro</div>
-            <h2 class="mt-2 text-2xl font-semibold text-slate-950">Mensalidades por status</h2>
-            <div class="chart-shell chart-shell-compact mt-6">
+            <h2 class="mt-2 text-xl font-semibold text-slate-950">Mensalidades por status</h2>
+            <div class="chart-shell chart-shell-compact chart-shell-donut mt-6">
                 <canvas data-chart-source="{{ $chartPrefix }}-invoices-status"></canvas>
             </div>
             <script id="{{ $chartPrefix }}-invoices-status" type="application/json">@json($charts['invoicesByStatus'])</script>
@@ -160,8 +159,8 @@
 
         <section class="panel p-6">
             <div class="section-title">Operacao</div>
-            <h2 class="mt-2 text-2xl font-semibold text-slate-950">Uso de recursos</h2>
-            <div class="chart-shell mt-6">
+            <h2 class="mt-2 text-xl font-semibold text-slate-950">Uso de recursos</h2>
+            <div class="chart-shell chart-shell-compact mt-6">
                 <canvas data-chart-source="{{ $chartPrefix }}-resource-usage"></canvas>
             </div>
             <script id="{{ $chartPrefix }}-resource-usage" type="application/json">@json($charts['resourceUsage'])</script>
@@ -169,25 +168,52 @@
 
         <section class="panel p-6">
             <div class="section-title">Tendencia</div>
-            <h2 class="mt-2 text-2xl font-semibold text-slate-950">Reservas por periodo</h2>
-            <div class="chart-shell mt-6">
+            <h2 class="mt-2 text-xl font-semibold text-slate-950">Reservas por periodo</h2>
+            <div class="chart-shell chart-shell-compact mt-6">
                 <canvas data-chart-source="{{ $chartPrefix }}-reservation-trend"></canvas>
             </div>
             <script id="{{ $chartPrefix }}-reservation-trend" type="application/json">@json($charts['reservationTrend'])</script>
         </section>
 
         <section class="panel p-6">
-            <div class="section-title">Comparativo</div>
-            <h2 class="mt-2 text-2xl font-semibold text-slate-950">Reservas por filial</h2>
-            <div class="chart-shell mt-6">
-                <canvas data-chart-source="{{ $chartPrefix }}-reservations-branch"></canvas>
+            <div class="section-title">Propostas</div>
+            <h2 class="mt-2 text-xl font-semibold text-slate-950">Pendencias por tipo</h2>
+            <div class="chart-shell chart-shell-compact mt-6">
+                <canvas data-chart-source="{{ $chartPrefix }}-proposal-types"></canvas>
             </div>
-            <script id="{{ $chartPrefix }}-reservations-branch" type="application/json">@json($charts['reservationsByBranch'])</script>
+            <script id="{{ $chartPrefix }}-proposal-types" type="application/json">@json($charts['proposalTypes'])</script>
         </section>
 
         <section class="panel p-6">
+            <div class="section-title">Origem</div>
+            <h2 class="mt-2 text-xl font-semibold text-slate-950">Propostas por origem</h2>
+            <div class="chart-shell chart-shell-compact chart-shell-donut mt-6">
+                <canvas data-chart-source="{{ $chartPrefix }}-proposal-origins"></canvas>
+            </div>
+            <script id="{{ $chartPrefix }}-proposal-origins" type="application/json">@json($charts['proposalOrigins'])</script>
+        </section>
+
+        <section class="panel p-6">
+            <div class="section-title">Estoque</div>
+            <h2 class="mt-2 text-xl font-semibold text-slate-950">Consumo por categoria</h2>
+            <div class="chart-shell chart-shell-compact mt-6">
+                <canvas data-chart-source="{{ $chartPrefix }}-inventory-category"></canvas>
+            </div>
+            <script id="{{ $chartPrefix }}-inventory-category" type="application/json">@json($charts['inventoryConsumptionByCategory'])</script>
+        </section>
+
+        <section class="panel p-6">
+            <div class="section-title">Estoque</div>
+            <h2 class="mt-2 text-xl font-semibold text-slate-950">Consumo por item</h2>
+            <div class="chart-shell chart-shell-compact mt-6">
+                <canvas data-chart-source="{{ $chartPrefix }}-inventory-item"></canvas>
+            </div>
+            <script id="{{ $chartPrefix }}-inventory-item" type="application/json">@json($charts['inventoryConsumptionByItem'])</script>
+        </section>
+
+        <section class="panel p-6 xl:col-span-2">
             <div class="section-title">Detalhamento</div>
-            <h2 class="mt-2 text-2xl font-semibold text-slate-950">Titulares e planos com maior concentracao</h2>
+            <h2 class="mt-2 text-xl font-semibold text-slate-950">Titulares, planos e itens criticos</h2>
             <div class="mt-6 grid gap-4 md:grid-cols-2">
                 <div class="panel-muted p-5">
                     <div class="font-semibold text-slate-900">Titulares com mais dependentes</div>
@@ -213,6 +239,20 @@
                             </div>
                         @empty
                             <p class="text-sm text-slate-500">Sem dependentes associados a planos no recorte.</p>
+                        @endforelse
+                    </div>
+                </div>
+
+                <div class="panel-muted p-5 md:col-span-2">
+                    <div class="font-semibold text-slate-900">Itens em alerta</div>
+                    <div class="mt-4 grid gap-3 md:grid-cols-2">
+                        @forelse ($reportData['lowStockItems']->take(8) as $item)
+                            <div class="flex items-center justify-between gap-3 rounded-2xl border border-white/70 bg-white/80 px-4 py-3 text-sm">
+                                <span class="font-semibold text-slate-900">{{ $item->name }} <span class="text-slate-500">({{ $item->category }})</span></span>
+                                <span class="chip-warning">{{ number_format((float) $item->current_quantity, 2, ',', '.') }} {{ $item->unit }}</span>
+                            </div>
+                        @empty
+                            <p class="text-sm text-slate-500">Nenhum item abaixo do minimo no recorte.</p>
                         @endforelse
                     </div>
                 </div>

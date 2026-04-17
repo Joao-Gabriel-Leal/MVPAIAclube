@@ -63,4 +63,9 @@ class Reservation extends Model
     {
         return $this->belongsTo(User::class, 'created_by_user_id');
     }
+
+    public function inventoryMovements()
+    {
+        return $this->hasMany(InventoryMovement::class);
+    }
 }

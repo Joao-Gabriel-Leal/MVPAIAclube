@@ -1,21 +1,19 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
+        @php($clubSetting = \App\Models\ClubSetting::current())
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>ClubeAIA</title>
-
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=manrope:400,500,600,700,800|fraunces:500,600,700" rel="stylesheet" />
-
+        <title>{{ $clubSetting->resolvedBrandName() }}</title>
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <style>:root { {{ $clubSetting->themeCssVariablesInline() }} }</style>
     </head>
     <body x-data="{ sidebarOpen: false }" @keydown.escape.window="sidebarOpen = false">
         <div class="relative min-h-screen overflow-hidden">
-            <div class="pointer-events-none absolute inset-x-0 top-0 h-80 bg-[radial-gradient(circle_at_top,_rgba(216,180,254,0.45),_transparent_55%)]"></div>
-            <div class="pointer-events-none absolute inset-x-0 top-24 h-72 bg-[radial-gradient(circle_at_center,_rgba(244,114,182,0.14),_transparent_55%)]"></div>
+            <div class="pointer-events-none absolute inset-x-0 top-0 h-80 bg-[radial-gradient(circle_at_top,_rgba(41,88,184,0.14),_transparent_55%)]"></div>
+            <div class="pointer-events-none absolute inset-x-0 top-24 h-72 bg-[radial-gradient(circle_at_center,_rgba(242,207,47,0.2),_transparent_55%)]"></div>
 
             <div class="app-shell relative z-10">
                 <aside class="hidden lg:block">
@@ -41,20 +39,20 @@
 
                         <div class="min-w-0">
                             <div class="mobile-topbar__eyebrow">Area logada</div>
-                            <div class="mobile-topbar__title">ClubeAIA</div>
+                            <div class="mobile-topbar__title">{{ $clubSetting->resolvedBrandName() }}</div>
                         </div>
                     </div>
 
-                    <main class="mx-auto w-full max-w-[110rem] flex-1 px-4 pb-12 pt-6 sm:px-6 lg:px-8 lg:pt-8">
+                    <main class="mx-auto w-full max-w-[108rem] flex-1 px-4 pb-10 pt-5 sm:px-5 lg:px-6 lg:pt-6">
                         @isset($header)
-                            <div class="panel mb-6 overflow-hidden px-6 py-7 sm:px-8 sm:py-8">
-                                <div class="absolute inset-y-0 right-0 hidden w-56 bg-[radial-gradient(circle,_rgba(216,180,254,0.28),_transparent_62%)] lg:block"></div>
+                            <div class="panel mb-5 overflow-hidden px-5 py-6 sm:px-6 sm:py-6">
+                                <div class="absolute inset-y-0 right-0 hidden w-56 bg-[radial-gradient(circle,_rgba(242,207,47,0.18),_transparent_62%)] lg:block"></div>
                                 <div class="relative">{{ $header }}</div>
                             </div>
                         @endisset
 
                         @if (session('status'))
-                            <div class="status-banner status-banner-success mb-6">
+                            <div class="status-banner status-banner-success mb-5">
                                 {{ session('status') }}
                             </div>
                         @endif

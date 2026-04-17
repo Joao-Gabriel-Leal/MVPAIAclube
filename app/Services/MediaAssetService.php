@@ -26,6 +26,12 @@ class MediaAssetService
             throw new RuntimeException('Nao foi possivel ler o arquivo enviado.');
         }
 
+        $binaryStream = $path ? fopen($path, 'rb') : false;
+
+        if ($binaryStream === false) {
+            throw new RuntimeException('Nao foi possivel abrir o arquivo enviado em modo binario.');
+        }
+
         $imageSize = $path ? @getimagesize($path) : false;
 
         return MediaAsset::query()->create([
@@ -38,7 +44,7 @@ class MediaAssetService
             'width' => $imageSize !== false ? $imageSize[0] : null,
             'height' => $imageSize !== false ? $imageSize[1] : null,
             'checksum' => hash('sha256', $contents),
-            'content' => $contents,
+            'content' => $binaryStream,
         ]);
     }
 
@@ -58,6 +64,18 @@ class MediaAssetService
         $this->deleteIfOrphaned($previousAsset);
     }
 
+    public function replaceClubLogo(ClubSetting $clubSetting, UploadedFile $file): void
+    {
+        $clubSetting->loadMissing('logoMedia');
+        $previousAsset = $clubSetting->logoMedia;
+        $asset = $this->createFromUpload($file, 'branding', MediaAsset::VISIBILITY_PUBLIC, 'logo');
+
+        $clubSetting->logo_media_asset_id = $asset->id;
+        $clubSetting->save();
+
+        $this->deleteIfOrphaned($previousAsset);
+    }
+
     public function removeHomeSlot(ClubSetting $clubSetting, string $slot): void
     {
         $definition = ClubMediaSlots::definition($slot);
@@ -67,6 +85,16 @@ class MediaAssetService
         $clubSetting->loadMissing($relation);
         $previousAsset = $clubSetting->{$relation};
         $clubSetting->{$field} = null;
+        $clubSetting->save();
+
+        $this->deleteIfOrphaned($previousAsset);
+    }
+
+    public function removeClubLogo(ClubSetting $clubSetting): void
+    {
+        $clubSetting->loadMissing('logoMedia');
+        $previousAsset = $clubSetting->logoMedia;
+        $clubSetting->logo_media_asset_id = null;
         $clubSetting->save();
 
         $this->deleteIfOrphaned($previousAsset);
@@ -98,6 +126,8 @@ class MediaAssetService
 
         $isUsedByClubSettings = ClubSetting::query()
             ->where(function ($query) use ($asset) {
+                $query->orWhere('logo_media_asset_id', $asset->id);
+
                 foreach (ClubMediaSlots::foreignKeyColumns() as $column) {
                     $query->orWhere($column, $asset->id);
                 }
@@ -136,6 +166,11 @@ class MediaAssetService
                     $contents = Storage::disk('public')->get($path);
                     $absolutePath = Storage::disk('public')->path($path);
                     $imageSize = @getimagesize($absolutePath);
+                    $binaryStream = fopen($absolutePath, 'rb');
+
+                    if ($binaryStream === false) {
+                        continue;
+                    }
 
                     $asset = MediaAsset::query()->create([
                         'context' => 'profile_photo',
@@ -147,7 +182,7 @@ class MediaAssetService
                         'width' => $imageSize !== false ? $imageSize[0] : null,
                         'height' => $imageSize !== false ? $imageSize[1] : null,
                         'checksum' => hash('sha256', $contents),
-                        'content' => $contents,
+                        'content' => $binaryStream,
                     ]);
 
                     DB::transaction(function () use ($user, $asset): void {

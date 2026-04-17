@@ -8,6 +8,7 @@ use App\Enums\MembershipStatus;
 use App\Enums\ReservationStatus;
 use App\Models\Branch;
 use App\Models\Dependent;
+use App\Models\InventoryItem;
 use App\Models\Member;
 use App\Models\MembershipInvoice;
 use App\Models\Reservation;
@@ -16,6 +17,11 @@ use Illuminate\Support\Facades\Cache;
 
 class DashboardService
 {
+    public function __construct(
+        protected ProposalService $proposalService,
+    ) {
+    }
+
     public function summary(User $user): array
     {
         return Cache::remember("dashboard.summary.{$user->id}", now()->addMinutes(5), function () use ($user) {
@@ -33,16 +39,20 @@ class DashboardService
 
     protected function matrixSummary(): array
     {
+        $proposalCounts = $this->proposalService->pendingCounts();
+
         return [
             'scope' => 'matrix',
             'cards' => [
                 'Total de filiais' => Branch::query()->count(),
                 'Associados ativos' => Member::query()->where('status', MembershipStatus::Active)->count(),
-                'Associados pendentes' => Member::query()->where('status', MembershipStatus::Pending)->count(),
+                'Propostas pendentes' => $proposalCounts['total'],
+                'Associados pendentes' => $proposalCounts['members'],
+                'Dependentes pendentes' => $proposalCounts['dependents'],
                 'Inadimplentes' => Member::query()->where('status', MembershipStatus::Delinquent)->count(),
                 'Reservas do mes' => Reservation::query()->whereMonth('reservation_date', now()->month)->count(),
                 'Faturamento previsto' => (float) MembershipInvoice::query()->whereMonth('billing_period', now()->month)->sum('amount'),
-                'Dependentes' => Dependent::query()->count(),
+                'Itens em alerta' => InventoryItem::query()->whereRaw('current_quantity <= minimum_quantity')->count(),
             ],
             'branchComparisons' => Branch::query()
                 ->withCount([
@@ -50,26 +60,37 @@ class DashboardService
                     'resources',
                 ])
                 ->get(),
-            'pendingMembers' => Member::query()->with(['user', 'primaryBranch', 'plan'])->where('status', MembershipStatus::Pending)->latest()->take(8)->get(),
+            'recentProposals' => $this->proposalService->recent(limit: 8),
             'recentInvoices' => MembershipInvoice::query()->with(['member.user', 'branch'])->latest()->take(8)->get(),
         ];
     }
 
     protected function branchSummary(User $user): array
     {
+        $proposalCounts = $this->proposalService->pendingCounts($user->branch_id);
+        $lowStockItems = InventoryItem::query()
+            ->where('branch_id', $user->branch_id)
+            ->whereRaw('current_quantity <= minimum_quantity')
+            ->orderBy('current_quantity')
+            ->take(8)
+            ->get();
+
         return [
             'scope' => 'branch',
             'cards' => [
                 'Associados ativos' => Member::query()->where('primary_branch_id', $user->branch_id)->where('status', MembershipStatus::Active)->count(),
-                'Associados pendentes' => Member::query()->where('primary_branch_id', $user->branch_id)->where('status', MembershipStatus::Pending)->count(),
-                'Dependentes pendentes' => Dependent::query()->where('branch_id', $user->branch_id)->where('status', DependentStatus::Pending)->count(),
+                'Propostas pendentes' => $proposalCounts['total'],
+                'Associados pendentes' => $proposalCounts['members'],
+                'Dependentes pendentes' => $proposalCounts['dependents'],
                 'Mensalidades pendentes' => MembershipInvoice::query()->where('branch_id', $user->branch_id)->where('status', InvoiceStatus::Pending)->count(),
                 'Reservas do mes' => Reservation::query()->where('branch_id', $user->branch_id)->whereMonth('reservation_date', now()->month)->count(),
                 'Receita prevista' => (float) MembershipInvoice::query()->where('branch_id', $user->branch_id)->whereMonth('billing_period', now()->month)->sum('amount'),
+                'Itens em alerta' => $lowStockItems->count(),
             ],
-            'pendingMembers' => Member::query()->with(['user', 'primaryBranch', 'plan'])->where('primary_branch_id', $user->branch_id)->where('status', MembershipStatus::Pending)->latest()->take(8)->get(),
+            'recentProposals' => $this->proposalService->recent($user->branch_id, 8),
             'recentReservations' => Reservation::query()->with(['member.user', 'resource'])->where('branch_id', $user->branch_id)->latest()->take(8)->get(),
             'recentInvoices' => MembershipInvoice::query()->with(['member.user'])->where('branch_id', $user->branch_id)->latest()->take(8)->get(),
+            'lowStockItems' => $lowStockItems,
         ];
     }
 

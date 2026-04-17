@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\MembershipStatus;
+use App\Enums\ProposalOrigin;
 use App\Enums\UserRole;
 use App\Models\Member;
 use App\Models\User;
@@ -40,6 +41,7 @@ class MemberService
                 'primary_branch_id' => $data['primary_branch_id'],
                 'plan_id' => $data['plan_id'],
                 'status' => $status,
+                'source' => $data['source'] ?? ProposalOrigin::Manual->value,
                 'custom_monthly_fee' => $data['custom_monthly_fee'] ?? null,
                 'notes' => $data['notes'] ?? null,
                 'approved_at' => $status === MembershipStatus::Active->value ? now() : null,

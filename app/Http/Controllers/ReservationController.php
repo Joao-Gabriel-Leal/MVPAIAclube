@@ -44,12 +44,17 @@ class ReservationController extends Controller
         $user = $request->user();
         $selectedBranchId = $user->isAdminBranch()
             ? $user->branch_id
-            : ($request->filled('branch_id') ? $request->integer('branch_id') : null);
+            : ($user->isAdminMatrix() && $request->filled('branch_id') ? $request->integer('branch_id') : null);
+        $resourceBranchIds = $user->managedBranchIds()->filter()->values();
 
         return view('reservations.form', [
             'resources' => ClubResource::query()
                 ->with('branch')
-                ->when($selectedBranchId, fn ($query) => $query->where('branch_id', $selectedBranchId))
+                ->when(
+                    $user->isAdminMatrix(),
+                    fn ($query) => $query->when($selectedBranchId, fn ($resourceQuery) => $resourceQuery->where('branch_id', $selectedBranchId)),
+                    fn ($query) => $query->whereIn('branch_id', $resourceBranchIds->all())
+                )
                 ->orderBy('name')
                 ->get(),
             'members' => $user->isAdminMatrix()

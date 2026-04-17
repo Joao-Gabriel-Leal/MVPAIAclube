@@ -3,10 +3,7 @@
         <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div class="max-w-4xl">
                 <div class="section-title">Base social</div>
-                <h1 class="display-title mt-3">Membros e dependentes em uma unica visao</h1>
-                <p class="lead-text mt-3">
-                    A area de membros agora concentra busca, contexto de filial e uma separacao clara entre associados e dependentes.
-                </p>
+                <h1 class="display-title mt-3">Associados e dependentes</h1>
             </div>
 
             <div class="flex flex-wrap gap-3">
@@ -24,17 +21,17 @@
     <div class="grid gap-4 md:grid-cols-3">
         <div class="stat-card">
             <div class="section-title">Associados encontrados</div>
-            <div class="mt-3 text-4xl font-bold text-slate-950">{{ $summary['members'] }}</div>
+            <div class="metric-value">{{ $summary['members'] }}</div>
             <p class="mt-2 text-sm text-slate-600">Titulares dentro do contexto atual de busca.</p>
         </div>
         <div class="stat-card">
             <div class="section-title">Dependentes encontrados</div>
-            <div class="mt-3 text-4xl font-bold text-slate-950">{{ $summary['dependents'] }}</div>
+            <div class="metric-value">{{ $summary['dependents'] }}</div>
             <p class="mt-2 text-sm text-slate-600">Resultados consolidados sem precisar trocar de area.</p>
         </div>
         <div class="stat-card">
             <div class="section-title">Escopo ativo</div>
-            <div class="mt-3 text-2xl font-bold text-slate-950">{{ $selectedBranch?->name ?? 'Visao consolidada' }}</div>
+            <div class="mt-3 text-xl font-bold text-slate-950">{{ $selectedBranch?->name ?? 'Visao consolidada' }}</div>
             <p class="mt-2 text-sm text-slate-600">
                 {{ $selectedBranch ? 'Os dados abaixo respeitam a filial selecionada.' : 'Sem filial filtrada, voce esta vendo o consolidado permitido pelo seu perfil.' }}
             </p>
@@ -65,15 +62,14 @@
                 </select>
             </div>
 
-            <div>
-                <label class="field-label" for="status">Status</label>
-                <select class="field-select" name="status" id="status">
-                    <option value="">Todos</option>
-                    @foreach ($statuses as $status)
-                        <option value="{{ $status->value }}" @selected(request('status') === $status->value)>{{ $status->label() }}</option>
-                    @endforeach
-                </select>
-            </div>
+                <div>
+                    <label class="field-label" for="status">Status</label>
+                    <select class="field-select" name="status" id="status">
+                        @foreach ($statusOptions as $option)
+                            <option value="{{ $option['value'] }}" @selected($statusFilter === $option['value'])>{{ $option['label'] }}</option>
+                        @endforeach
+                    </select>
+                </div>
 
             <div class="flex items-end">
                 <button class="btn-secondary w-full" type="submit">Filtrar</button>
@@ -85,8 +81,8 @@
                 @if ($search !== '')
                     <span class="chip-brand">Busca: {{ $search }}</span>
                 @endif
-                @if (request('status'))
-                    <span class="chip-info">Status: {{ collect($statuses)->first(fn ($status) => $status->value === request('status'))?->label() ?? request('status') }}</span>
+                @if ($statusFilter !== \App\Enums\MembershipStatus::Active->value)
+                    <span class="chip-info">Base: {{ data_get($statusOptions->firstWhere('value', $statusFilter), 'label', $statusFilter) }}</span>
                 @endif
                 @if ($selectedBranch)
                     <span class="chip-warning">Filial: {{ $selectedBranch->name }}</span>
@@ -98,11 +94,11 @@
 
     <div class="mt-6 grid gap-6">
         <section class="table-shell overflow-hidden">
-            <div class="flex flex-col gap-3 border-b border-violet-100/80 px-6 py-6 lg:flex-row lg:items-center lg:justify-between">
+            <div class="flex flex-col gap-3 border-b border-amber-100/80 px-6 py-6 lg:flex-row lg:items-center lg:justify-between">
                 <div>
                     <div class="section-title">Associados</div>
-                    <h2 class="mt-2 text-2xl font-semibold text-slate-950">Titulares da base</h2>
-                    <p class="mt-2 text-sm text-slate-600">Cada linha mostra o titular com plano, filial principal e acesso rapido a ficha completa.</p>
+                    <h2 class="mt-2 text-xl font-semibold text-slate-950">Titulares da base</h2>
+                    <p class="mt-2 text-sm text-slate-600">A tela mostra apenas a base administrativa, deixando pendentes exclusivamente na fila de propostas.</p>
                 </div>
                 <div class="chip-brand">{{ $summary['members'] }} resultado(s)</div>
             </div>
@@ -154,11 +150,11 @@
         </section>
 
         <section id="dependentes" class="table-shell overflow-hidden">
-            <div class="flex flex-col gap-3 border-b border-violet-100/80 px-6 py-6 lg:flex-row lg:items-center lg:justify-between">
+            <div class="flex flex-col gap-3 border-b border-amber-100/80 px-6 py-6 lg:flex-row lg:items-center lg:justify-between">
                 <div>
                     <div class="section-title">Dependentes</div>
-                    <h2 class="mt-2 text-2xl font-semibold text-slate-950">Dependentes vinculados aos associados</h2>
-                    <p class="mt-2 text-sm text-slate-600">A navegacao ficou consistente: dependentes continuam acessiveis, mas dentro do contexto correto de membros.</p>
+                    <h2 class="mt-2 text-xl font-semibold text-slate-950">Dependentes vinculados aos associados</h2>
+                    <p class="mt-2 text-sm text-slate-600">Os dependentes pendentes seguem para aprovacao em Propostas, enquanto esta area concentra a base liberada ou encerrada.</p>
                 </div>
                 <div class="chip-info">{{ $summary['dependents'] }} resultado(s)</div>
             </div>

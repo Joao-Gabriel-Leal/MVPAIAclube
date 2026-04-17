@@ -14,6 +14,8 @@ use App\Models\Plan;
 use App\Models\Reservation;
 use App\Models\ResourceSchedule;
 use App\Models\User;
+use App\Services\CardPublicTokenGenerator;
+use App\Services\CardSuffixGenerator;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -22,6 +24,9 @@ class ClubDemoSeeder extends Seeder
 {
     public function run(): void
     {
+        $cardSuffixGenerator = app(CardSuffixGenerator::class);
+        $cardPublicTokenGenerator = app(CardPublicTokenGenerator::class);
+
         $branches = Branch::query()->get()->keyBy('slug');
         $plans = Plan::query()->get()->keyBy('slug');
 
@@ -30,8 +35,10 @@ class ClubDemoSeeder extends Seeder
         foreach ($branches as $branch) {
             foreach ([
                 ['name' => 'Churrasqueira', 'price' => 150, 'capacity' => 20],
-                ['name' => 'Quadra', 'price' => 90, 'capacity' => 12],
-                ['name' => 'Salao', 'price' => 320, 'capacity' => 100],
+                ['name' => 'Quadra Poliesportiva', 'price' => 90, 'capacity' => 12],
+                ['name' => 'Parque Aquatico', 'price' => 180, 'capacity' => 40],
+                ['name' => 'Ginasio', 'price' => 260, 'capacity' => 80],
+                ['name' => 'Salao de Eventos', 'price' => 320, 'capacity' => 100],
             ] as $item) {
                 $resource = ClubResource::query()->updateOrCreate(
                     ['branch_id' => $branch->id, 'slug' => Str::slug($item['name'])],
@@ -61,43 +68,43 @@ class ClubDemoSeeder extends Seeder
             }
         }
 
-        $plans['bronze']->resources()->sync(
-            $resources->filter(fn (ClubResource $resource) => in_array($resource->name, ['Churrasqueira', 'Salao'], true))->pluck('id')
+        $plans['individual']->resources()->sync(
+            $resources->filter(fn (ClubResource $resource) => in_array($resource->name, ['Churrasqueira', 'Quadra Poliesportiva'], true))->pluck('id')
         );
-        $plans['prata']->resources()->sync($resources->pluck('id'));
-        $plans['ouro']->resources()->sync($resources->pluck('id'));
+        $plans['familia']->resources()->sync($resources->pluck('id'));
+        $plans['comunidade']->resources()->sync($resources->pluck('id'));
 
         $matrixAdmin = User::query()->updateOrCreate(
             ['email' => 'admin.matriz@clube.test'],
             [
-                'name' => 'Admin Matriz',
+                'name' => 'Gestor Clube AABB',
                 'role' => UserRole::AdminMatrix,
-                'phone' => '(11) 99999-0001',
-                'branch_id' => $branches['matriz-central']->id,
+                'phone' => '(61) 99999-0001',
+                'branch_id' => $branches['clube-aabb']->id,
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
             ]
         );
 
         User::query()->updateOrCreate(
-            ['email' => 'admin.zonasul@clube.test'],
+            ['email' => 'admin.brasilia@clube.test'],
             [
-                'name' => 'Admin Filial Zona Sul',
+                'name' => 'Gestor AABB Brasilia',
                 'role' => UserRole::AdminBranch,
-                'phone' => '(11) 99999-0002',
-                'branch_id' => $branches['zona-sul']->id,
+                'phone' => '(61) 99999-0002',
+                'branch_id' => $branches['brasilia']->id,
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
             ]
         );
 
         User::query()->updateOrCreate(
-            ['email' => 'admin.alphaville@clube.test'],
+            ['email' => 'admin.saopaulo@clube.test'],
             [
-                'name' => 'Admin Filial Alphaville',
+                'name' => 'Gestor AABB Sao Paulo',
                 'role' => UserRole::AdminBranch,
                 'phone' => '(11) 99999-0003',
-                'branch_id' => $branches['alphaville']->id,
+                'branch_id' => $branches['sao-paulo']->id,
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
             ]
@@ -119,14 +126,14 @@ class ClubDemoSeeder extends Seeder
         $member = Member::query()->updateOrCreate(
             ['user_id' => $memberUser->id],
             [
-                'primary_branch_id' => $branches['zona-sul']->id,
-                'plan_id' => $plans['prata']->id,
+                'primary_branch_id' => $branches['brasilia']->id,
+                'plan_id' => $plans['familia']->id,
                 'status' => MembershipStatus::Active,
                 'approved_at' => now(),
                 'approved_by_user_id' => $matrixAdmin->id,
             ]
         );
-        $member->additionalBranches()->sync([$branches['alphaville']->id]);
+        $member->additionalBranches()->sync([$branches['sao-paulo']->id, $branches['sao-luis']->id]);
 
         $pendingMemberUser = User::query()->updateOrCreate(
             ['email' => 'pendente@clube.test'],
@@ -144,8 +151,8 @@ class ClubDemoSeeder extends Seeder
         Member::query()->updateOrCreate(
             ['user_id' => $pendingMemberUser->id],
             [
-                'primary_branch_id' => $branches['alphaville']->id,
-                'plan_id' => $plans['bronze']->id,
+                'primary_branch_id' => $branches['salvador']->id,
+                'plan_id' => $plans['individual']->id,
                 'status' => MembershipStatus::Pending,
             ]
         );
@@ -166,8 +173,8 @@ class ClubDemoSeeder extends Seeder
         $delinquentMember = Member::query()->updateOrCreate(
             ['user_id' => $delinquentUser->id],
             [
-                'primary_branch_id' => $branches['zona-sul']->id,
-                'plan_id' => $plans['ouro']->id,
+                'primary_branch_id' => $branches['rio-de-janeiro']->id,
+                'plan_id' => $plans['comunidade']->id,
                 'status' => MembershipStatus::Delinquent,
                 'approved_at' => now()->subMonths(6),
                 'approved_by_user_id' => $matrixAdmin->id,
@@ -223,7 +230,7 @@ class ClubDemoSeeder extends Seeder
         );
 
         $resource = ClubResource::query()
-            ->where('branch_id', $branches['zona-sul']->id)
+            ->where('branch_id', $branches['brasilia']->id)
             ->where('slug', 'churrasqueira')
             ->first();
 
@@ -266,5 +273,29 @@ class ClubDemoSeeder extends Seeder
                 'created_by_user_id' => $matrixAdmin->id,
             ]
         );
+
+        User::query()
+            ->whereIn('role', [UserRole::Member, UserRole::Dependent])
+            ->where(function ($query) {
+                $query->whereNull('card_suffix')
+                    ->orWhereNull('card_public_token');
+            })
+            ->orderBy('id')
+            ->get()
+            ->each(function (User $user) use ($cardSuffixGenerator, $cardPublicTokenGenerator) {
+                $updates = [];
+
+                if (! $user->card_suffix) {
+                    $updates['card_suffix'] = $cardSuffixGenerator->generate();
+                }
+
+                if (! $user->card_public_token) {
+                    $updates['card_public_token'] = $cardPublicTokenGenerator->generate();
+                }
+
+                if ($updates !== []) {
+                    $user->forceFill($updates)->save();
+                }
+            });
     }
 }

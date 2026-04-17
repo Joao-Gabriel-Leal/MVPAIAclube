@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\MembershipStatus;
+use App\Enums\ProposalOrigin;
 use Database\Factories\MemberFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -19,6 +20,7 @@ class Member extends Model
         'primary_branch_id',
         'plan_id',
         'status',
+        'source',
         'custom_monthly_fee',
         'approved_at',
         'approved_by_user_id',
@@ -30,6 +32,7 @@ class Member extends Model
     {
         return [
             'status' => MembershipStatus::class,
+            'source' => ProposalOrigin::class,
             'custom_monthly_fee' => 'decimal:2',
             'approved_at' => 'datetime',
             'cancelled_at' => 'datetime',

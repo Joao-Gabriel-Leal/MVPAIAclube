@@ -143,14 +143,73 @@ function initializeMasks(root = document) {
     root.querySelectorAll('input').forEach(bindMask);
 }
 
+function initializeMediaSlotPreviews(root = document) {
+    root.querySelectorAll('[data-max-upload-bytes]').forEach((input) => {
+        if (input.dataset.mediaPreviewBound === 'true') {
+            return;
+        }
+
+        input.dataset.mediaPreviewBound = 'true';
+
+        const slotCard = input.closest('.media-slot-card');
+        const preview = slotCard?.querySelector('[data-media-slot-preview]');
+        const maxUploadBytes = Number(input.dataset.maxUploadBytes || 0);
+
+        input.addEventListener('change', () => {
+            const currentObjectUrl = input.dataset.objectUrl;
+
+            if (currentObjectUrl) {
+                URL.revokeObjectURL(currentObjectUrl);
+                delete input.dataset.objectUrl;
+            }
+
+            input.setCustomValidity('');
+
+            const [file] = input.files || [];
+
+            if (!file) {
+                return;
+            }
+
+            if (maxUploadBytes > 0 && file.size > maxUploadBytes) {
+                input.setCustomValidity(`Use uma imagem de ate ${formatFileSize(maxUploadBytes)}.`);
+                input.reportValidity();
+                return;
+            }
+
+            if (!file.type.startsWith('image/') || !preview) {
+                return;
+            }
+
+            const objectUrl = URL.createObjectURL(file);
+            const image = document.createElement('img');
+
+            image.src = objectUrl;
+            image.alt = file.name;
+            image.className = 'media-slot-preview__image';
+
+            preview.replaceChildren(image);
+            input.dataset.objectUrl = objectUrl;
+        });
+    });
+}
+
+function formatFileSize(bytes) {
+    const megabytes = bytes / (1024 * 1024);
+
+    return `${megabytes.toFixed(megabytes >= 10 ? 0 : 1)} MB`;
+}
+
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         initializeMasks();
+        initializeMediaSlotPreviews();
         initializeAnalyticsCharts();
         initializeReservationCalendars();
     });
 } else {
     initializeMasks();
+    initializeMediaSlotPreviews();
     initializeAnalyticsCharts();
     initializeReservationCalendars();
 }

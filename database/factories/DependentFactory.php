@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\DependentStatus;
+use App\Enums\ProposalOrigin;
 use App\Models\Branch;
 use App\Models\Dependent;
 use App\Models\Member;
@@ -22,6 +23,7 @@ class DependentFactory extends Factory
             'branch_id' => Branch::factory(),
             'relationship' => fake()->randomElement(['Conjuge', 'Filho(a)', 'Pai', 'Mae']),
             'status' => DependentStatus::Active,
+            'source' => ProposalOrigin::Manual,
             'approved_at' => now(),
             'approved_by_user_id' => null,
         ];

@@ -18,6 +18,8 @@ class ReportDataController extends Controller
                 'start_date' => ['nullable', 'date'],
                 'end_date' => ['nullable', 'date'],
                 'status' => ['nullable', 'string'],
+                'proposal_origin' => ['nullable', 'in:manual,public'],
+                'inventory_category' => ['nullable', 'string', 'max:100'],
             ]))
         );
     }

@@ -12,9 +12,9 @@ class PlanSeeder extends Seeder
     {
         $plans = [
             [
-                'name' => 'Bronze',
-                'slug' => 'bronze',
-                'description' => 'Plano de entrada para uso essencial do clube.',
+                'name' => 'Associado Individual',
+                'slug' => 'individual',
+                'description' => 'Categoria demonstrativa para acesso individual a esporte, lazer e servicos essenciais do clube.',
                 'base_price' => 129.90,
                 'dependent_limit' => 1,
                 'guest_limit_per_reservation' => 2,
@@ -24,9 +24,9 @@ class PlanSeeder extends Seeder
                 'dependents_inherit_benefits' => false,
             ],
             [
-                'name' => 'Prata',
-                'slug' => 'prata',
-                'description' => 'Plano intermediario com beneficios ampliados.',
+                'name' => 'Associado Familia',
+                'slug' => 'familia',
+                'description' => 'Categoria demonstrativa com foco em dependentes, convivencia e mais flexibilidade de uso.',
                 'base_price' => 179.90,
                 'dependent_limit' => 3,
                 'guest_limit_per_reservation' => 5,
@@ -36,9 +36,9 @@ class PlanSeeder extends Seeder
                 'dependents_inherit_benefits' => true,
             ],
             [
-                'name' => 'Ouro',
-                'slug' => 'ouro',
-                'description' => 'Plano premium com maior flexibilidade para familias.',
+                'name' => 'Associado Comunidade',
+                'slug' => 'comunidade',
+                'description' => 'Categoria demonstrativa com maior alcance de beneficios e uso ampliado da estrutura.',
                 'base_price' => 249.90,
                 'dependent_limit' => 5,
                 'guest_limit_per_reservation' => 8,

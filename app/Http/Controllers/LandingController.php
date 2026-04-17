@@ -6,7 +6,6 @@ use App\Models\Branch;
 use App\Models\ClubSetting;
 use App\Models\Plan;
 use App\Support\ClubMediaSlots;
-use Illuminate\Support\Str;
 
 class LandingController extends Controller
 {
@@ -14,27 +13,41 @@ class LandingController extends Controller
     {
         $clubSetting = ClubSetting::current();
         $homeMediaLibrary = $clubSetting->homeMediaLibrary();
+        $brandName = $clubSetting->resolvedBrandName();
+        $activePlans = Plan::query()->active()->orderBy('id')->get();
+        $recommendedPlanId = null;
+
+        if ($clubSetting->recommended_plan_id) {
+            $recommendedPlanId = $activePlans->contains('id', $clubSetting->recommended_plan_id)
+                ? $clubSetting->recommended_plan_id
+                : null;
+        } else {
+            $recommendedPlanId = $activePlans->firstWhere('slug', 'familia')?->id;
+        }
 
         $branches = Branch::query()
             ->active()
-            ->orderBy('type')
+            ->orderByRaw("case when type = 'headquarters' then 0 else 1 end")
             ->orderBy('name')
             ->get()
             ->map(function (Branch $branch) {
-                $address = (string) $branch->address;
-
                 return [
                     'model' => $branch,
+                    'type' => $branch->type->value,
                     'name' => $branch->name,
-                    'address' => $address !== '' ? Str::beforeLast($address, ' - ') : 'Endereco em breve',
-                    'city' => $address !== '' ? Str::afterLast($address, ' - ') : 'Localizacao em breve',
+                    'address' => (string) ($branch->address ?: 'Endereco em breve'),
+                    'city' => $branch->publicCity(),
+                    'phone' => $branch->publicPhone(),
+                    'phone_link' => $branch->publicPhoneLink(),
+                    'whatsapp' => $branch->publicWhatsapp(),
+                    'whatsapp_link' => $branch->publicWhatsappLink(),
+                    'email' => $branch->email,
+                    'hours' => $branch->publicHours(),
+                    'summary' => $branch->publicSummary(),
                 ];
             });
 
-        $plans = Plan::query()
-            ->active()
-            ->orderBy('id')
-            ->get()
+        $plans = $activePlans
             ->map(function (Plan $plan) {
                 $benefits = [
                     'Ate '.$plan->dependent_limit.' dependente(s)',
@@ -48,20 +61,28 @@ class LandingController extends Controller
                 ];
 
                 return [
+                    'id' => $plan->id,
                     'model' => $plan,
                     'name' => $plan->name,
                     'slug' => $plan->slug,
                     'price' => $plan->base_price,
-                    'recommended' => $plan->slug === 'prata',
                     'benefits' => array_slice($benefits, 0, 4),
                 ];
-            });
+            })
+            ->map(fn (array $plan) => [
+                ...$plan,
+                'recommended' => $plan['id'] === $recommendedPlanId,
+            ]);
 
         return view('welcome', [
+            'clubSetting' => $clubSetting,
+            'brandName' => $brandName,
             'branches' => $branches,
             'plans' => $plans,
             'heroImageUrl' => $homeMediaLibrary['hero_banner']?->url(),
-            'aboutText' => 'O ClubeAIA combina esporte, lazer e convivio em um ambiente pensado para dias mais leves, encontros marcantes e uma rotina de clube que se entende rapido.',
+            'heroTitle' => $clubSetting->resolvedHeroTitle(),
+            'heroSubtitle' => $clubSetting->resolvedHeroSubtitle(),
+            'aboutText' => $clubSetting->resolvedAboutText(),
             'galleryImages' => collect(ClubMediaSlots::home())
                 ->reject(fn (array $definition, string $slot) => $slot === 'hero_banner')
                 ->map(function (array $definition, string $slot) use ($homeMediaLibrary) {
@@ -70,7 +91,7 @@ class LandingController extends Controller
                     return [
                         'slot' => $slot,
                         'src' => $asset?->url(),
-                        'alt' => 'Imagem institucional do ClubeAIA',
+                        'alt' => null,
                         'title' => $definition['gallery_title'] ?? $definition['title'],
                         'placeholder' => $definition['placeholder_label'],
                     ];

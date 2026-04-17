@@ -27,6 +27,11 @@ class BranchFactory extends Factory
             'is_active' => true,
             'settings' => [
                 'timezone' => config('app.timezone'),
+                'city' => fake()->city(),
+                'summary' => fake()->sentence(),
+                'public_phone' => fake()->numerify('###########'),
+                'public_whatsapp' => fake()->numerify('###########'),
+                'public_hours' => 'Seg a Dom, 08h as 22h',
             ],
         ];
     }

@@ -4,17 +4,17 @@
 
 @layer base {
     :root {
-        --club-ink: 35 43 52;
-        --club-muted: 100 116 139;
+        --club-ink: 32 43 61;
+        --club-muted: 111 120 136;
         --club-surface: 255 255 255;
-        --club-surface-soft: 244 241 235;
-        --club-surface-muted: 237 233 225;
-        --club-brand: 23 53 84;
-        --club-brand-strong: 15 39 64;
-        --club-brand-soft: 228 235 243;
-        --club-brand-glow: 204 216 230;
-        --club-accent: 171 141 89;
-        --club-accent-soft: 244 236 220;
+        --club-surface-soft: 255 250 237;
+        --club-surface-muted: 249 240 205;
+        --club-brand: 41 88 184;
+        --club-brand-strong: 78 121 204;
+        --club-brand-soft: 233 240 252;
+        --club-brand-glow: 249 231 129;
+        --club-accent: 242 207 47;
+        --club-accent-soft: 252 245 193;
         --club-success: 16 185 129;
         --club-success-soft: 220 252 231;
         --club-warning: 245 158 11;
@@ -23,6 +23,7 @@
         --club-danger-soft: 254 226 226;
         --club-info: 59 130 246;
         --club-info-soft: 219 234 254;
+        --club-font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
     html {
@@ -34,15 +35,15 @@
         @apply min-h-screen text-slate-900 antialiased;
         background-color: rgb(var(--club-surface-soft));
         background-image:
-            radial-gradient(circle at 0% 0%, rgba(214, 223, 232, 0.7), transparent 24%),
-            radial-gradient(circle at 100% 0%, rgba(233, 224, 204, 0.45), transparent 20%),
-            radial-gradient(circle at 50% 100%, rgba(210, 218, 225, 0.38), transparent 30%),
-            linear-gradient(180deg, rgba(248, 246, 241, 0.98), rgba(255, 255, 255, 0.95));
-        font-family: "Manrope", ui-sans-serif, system-ui, sans-serif;
+            radial-gradient(circle at 0% 0%, rgba(255, 231, 138, 0.34), transparent 24%),
+            radial-gradient(circle at 100% 0%, rgba(198, 216, 250, 0.28), transparent 22%),
+            radial-gradient(circle at 50% 100%, rgba(255, 223, 99, 0.18), transparent 28%),
+            linear-gradient(180deg, rgba(255, 251, 240, 0.98), rgba(255, 255, 255, 0.96));
+        font-family: var(--club-font-sans);
     }
 
     ::selection {
-        background: rgba(180, 198, 217, 0.45);
+        background: rgba(242, 207, 47, 0.35);
     }
 
     [x-cloak] {
@@ -85,50 +86,133 @@
 
 @layer components {
     .panel {
-        @apply rounded-[2rem] border border-white/80 bg-white/90 backdrop-blur-xl;
+        @apply rounded-[1.7rem] border border-white/80 bg-white/90 backdrop-blur-xl;
         box-shadow:
             0 24px 60px -40px rgba(15, 23, 42, 0.26),
             0 12px 28px -24px rgba(100, 116, 139, 0.22);
     }
 
     .panel-muted {
-        @apply rounded-[2rem] border border-slate-200/90 bg-slate-100/80;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+        @apply rounded-[1.7rem] border border-amber-100/90;
+        background:
+            linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(255, 250, 237, 0.92));
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.7),
+            0 16px 36px -32px rgba(15, 23, 42, 0.16);
     }
 
     .panel-dark {
-        @apply rounded-[2rem] border border-white/10 text-white;
+        @apply rounded-[1.7rem] border border-white/25 text-white;
         background:
-            radial-gradient(circle at top left, rgba(255, 255, 255, 0.12), transparent 32%),
-            radial-gradient(circle at bottom right, rgba(196, 167, 112, 0.16), transparent 26%),
-            linear-gradient(160deg, rgba(23, 53, 84, 0.98), rgba(15, 39, 64, 0.98));
-        box-shadow: 0 30px 80px -42px rgba(15, 23, 42, 0.58);
+            radial-gradient(circle at top left, rgba(255, 255, 255, 0.12), transparent 24%),
+            radial-gradient(circle at bottom right, rgba(var(--club-accent), 0.22), transparent 22%),
+            linear-gradient(158deg, rgba(var(--club-brand), 0.98), rgba(var(--club-brand-strong), 0.96));
+        box-shadow: 0 28px 72px -42px rgba(20, 42, 97, 0.42);
+    }
+
+    .auth-hero-panel {
+        border-color: rgba(255, 255, 255, 0.12);
+        background-color: #16387f;
+        background:
+            radial-gradient(circle at top left, rgba(255, 255, 255, 0.08), transparent 18%),
+            radial-gradient(circle at bottom right, rgba(242, 207, 47, 0.22), transparent 22%),
+            linear-gradient(158deg, rgba(12, 33, 79, 1), rgba(24, 62, 140, 0.995) 52%, rgba(38, 88, 188, 0.98));
+        box-shadow: 0 42px 82px -50px rgba(5, 17, 43, 0.72);
+        position: relative;
+        isolation: isolate;
+    }
+
+    .auth-hero-panel::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(180deg, rgba(5, 14, 37, 0.24), rgba(5, 14, 37, 0.1)),
+            radial-gradient(circle at 100% 100%, rgba(242, 207, 47, 0.12), transparent 26%);
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .auth-hero-copy {
+        @apply mt-10 max-w-md rounded-[1.7rem] border px-5 py-6 sm:px-6;
+        background:
+            linear-gradient(180deg, rgba(8, 20, 50, 0.82), rgba(10, 26, 63, 0.74)),
+            rgba(9, 21, 49, 0.62);
+        border-color: rgba(255, 255, 255, 0.16);
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.09),
+            0 28px 48px -38px rgba(2, 8, 23, 0.76);
+        backdrop-filter: blur(10px);
+    }
+
+    .auth-hero-title {
+        @apply mt-3.5 max-w-md text-[1.95rem] font-semibold tracking-tight text-white sm:text-[2.2rem];
+        text-shadow: 0 10px 24px rgba(2, 8, 23, 0.34);
+        line-height: 1.05;
+    }
+
+    .auth-hero-text {
+        @apply mt-3.5 max-w-sm text-[0.88rem] leading-6;
+        color: rgba(255, 255, 255, 0.92);
+    }
+
+    .auth-hero-chip {
+        @apply inline-flex rounded-full px-3 py-1.5 text-[0.62rem] font-bold uppercase tracking-[0.14em] text-white;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background-color: rgba(7, 18, 42, 0.38);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .auth-access-card {
+        border-color: rgba(var(--club-accent), 0.5);
+        background:
+            linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 249, 227, 0.92));
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.82),
+            0 18px 36px -30px rgba(41, 88, 184, 0.18);
+    }
+
+    .auth-hero-link {
+        @apply inline-flex items-center rounded-full px-3 py-1.5 text-[0.72rem] font-semibold text-white transition;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        background-color: rgba(7, 18, 42, 0.22);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .auth-hero-link:hover {
+        border-color: rgba(255, 255, 255, 0.32);
+        background-color: rgba(7, 18, 42, 0.3);
     }
 
     .section-title {
-        @apply text-[0.72rem] font-extrabold uppercase tracking-[0.34em] text-slate-600;
+        @apply text-[0.74rem] font-semibold tracking-[0.08em] text-slate-600;
+        line-height: 1.15;
     }
 
     .display-title {
-        font-family: "Fraunces", serif;
-        @apply text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl;
+        @apply text-[1.78rem] font-semibold tracking-tight text-slate-950 sm:text-[2.25rem];
     }
 
     .lead-text {
-        @apply text-sm leading-7 text-slate-600 sm:text-base;
+        @apply text-[0.88rem] leading-6 text-slate-600;
     }
 
     .field-label {
-        @apply mb-2 block text-sm font-semibold text-slate-700;
+        @apply mb-1.5 block text-[0.88rem] font-semibold text-slate-700;
     }
 
     .field-hint {
-        @apply mt-2 text-sm text-slate-500;
+        @apply mt-1.5 text-[0.86rem] leading-5 text-slate-500;
     }
 
     .field-input {
-        @apply w-full rounded-[1.4rem] border border-slate-200 bg-white/95 px-4 py-3.5 text-sm text-slate-900 transition duration-200 placeholder:text-slate-400 focus:border-slate-400 focus:outline-none focus:ring-4 focus:ring-slate-200;
+        @apply w-full rounded-[1.1rem] border border-slate-200 bg-white/95 px-3.5 py-2.5 text-[0.9rem] text-slate-900 transition duration-200 placeholder:text-slate-400 focus:border-[rgb(var(--club-brand))] focus:outline-none focus:ring-4;
+        --tw-ring-color: rgba(var(--club-brand), 0.16);
         box-shadow: 0 16px 40px -34px rgba(15, 23, 42, 0.18);
+    }
+
+    .field-input:hover {
+        @apply border-slate-300;
     }
 
     .field-input:disabled {
@@ -136,33 +220,37 @@
     }
 
     .field-select {
-        @apply field-input appearance-none pr-12;
+        @apply field-input appearance-none pr-10;
         background-image:
             linear-gradient(45deg, transparent 50%, rgba(23, 53, 84, 0.85) 50%),
             linear-gradient(135deg, rgba(23, 53, 84, 0.85) 50%, transparent 50%);
         background-position:
-            calc(100% - 24px) calc(50% - 2px),
-            calc(100% - 18px) calc(50% - 2px);
+            calc(100% - 20px) calc(50% - 2px),
+            calc(100% - 14px) calc(50% - 2px);
         background-size: 6px 6px, 6px 6px;
         background-repeat: no-repeat;
     }
 
     .field-textarea {
-        @apply field-input min-h-32 resize-y;
+        @apply field-input min-h-28 resize-y;
     }
 
     .btn-primary {
-        @apply inline-flex items-center justify-center gap-2 rounded-[1.35rem] px-5 py-3.5 text-sm font-bold text-white transition duration-200;
-        background: linear-gradient(135deg, rgb(var(--club-brand)), rgb(var(--club-brand-strong)));
+        @apply inline-flex items-center justify-center gap-2 rounded-[1.1rem] px-3.5 py-2.5 text-[0.88rem] font-bold text-white transition duration-200;
+        background:
+            linear-gradient(135deg, rgb(var(--club-brand)), rgb(var(--club-brand-strong))),
+            linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent);
         box-shadow:
-            0 18px 30px -20px rgba(15, 23, 42, 0.45),
+            0 18px 30px -20px rgba(41, 88, 184, 0.32),
+            0 10px 22px -18px rgba(242, 207, 47, 0.55),
             inset 0 1px 0 rgba(255, 255, 255, 0.2);
     }
 
     .btn-primary:hover {
         transform: translateY(-1px);
         box-shadow:
-            0 24px 38px -24px rgba(15, 23, 42, 0.52),
+            0 24px 38px -24px rgba(41, 88, 184, 0.36),
+            0 14px 26px -18px rgba(242, 207, 47, 0.6),
             inset 0 1px 0 rgba(255, 255, 255, 0.2);
     }
 
@@ -173,8 +261,8 @@
     }
 
     .btn-secondary {
-        @apply inline-flex items-center justify-center gap-2 rounded-[1.35rem] border border-slate-200 bg-white/90 px-5 py-3.5 text-sm font-bold text-slate-700 transition duration-200 hover:border-slate-300 hover:bg-slate-50;
-        box-shadow: 0 16px 32px -30px rgba(15, 23, 42, 0.22);
+        @apply inline-flex items-center justify-center gap-2 rounded-[1.1rem] border border-amber-200/80 bg-white/90 px-3.5 py-2.5 text-[0.88rem] font-bold text-slate-700 transition duration-200 hover:border-amber-300 hover:bg-amber-50/80;
+        box-shadow: 0 16px 32px -30px rgba(41, 88, 184, 0.16);
     }
 
     .btn-secondary:disabled {
@@ -183,13 +271,13 @@
     }
 
     .btn-danger {
-        @apply inline-flex items-center justify-center gap-2 rounded-[1.35rem] px-5 py-3.5 text-sm font-bold text-white transition duration-200;
+        @apply inline-flex items-center justify-center gap-2 rounded-[1.15rem] px-4 py-3 text-[0.88rem] font-bold text-white transition duration-200;
         background: linear-gradient(135deg, rgb(var(--club-danger)), rgb(220 38 38));
         box-shadow: 0 18px 32px -20px rgba(239, 68, 68, 0.55);
     }
 
     .chip {
-        @apply inline-flex items-center rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-[0.18em];
+        @apply inline-flex items-center rounded-full px-2.5 py-1 text-[0.68rem] font-bold uppercase tracking-[0.16em];
     }
 
     .chip-success {
@@ -202,6 +290,13 @@
         background-color: rgb(var(--club-warning-soft));
     }
 
+    .chip-age {
+        @apply inline-flex items-center rounded-full px-3 py-1 text-[0.72rem] font-semibold tabular-nums text-amber-800;
+        background-color: rgba(254, 243, 199, 0.96);
+        letter-spacing: 0;
+        text-transform: none;
+    }
+
     .chip-danger {
         @apply chip text-rose-700;
         background-color: rgb(var(--club-danger-soft));
@@ -209,16 +304,16 @@
 
     .chip-info {
         @apply chip text-sky-700;
-        background-color: rgb(var(--club-info-soft));
-    }
-
-    .chip-brand {
-        @apply chip text-slate-700;
         background-color: rgb(var(--club-brand-soft));
     }
 
+    .chip-brand {
+        @apply chip text-amber-900;
+        background-color: rgb(var(--club-accent-soft));
+    }
+
     .status-banner {
-        @apply rounded-[1.6rem] border px-5 py-4 text-sm font-medium;
+        @apply rounded-[1.35rem] border px-4 py-3 text-[0.88rem] font-medium;
     }
 
     .status-banner-success {
@@ -231,8 +326,21 @@
         background-color: rgba(254, 226, 226, 0.8);
     }
 
+    .status-banner-warning {
+        @apply status-banner border-amber-200 text-amber-900;
+        background-color: rgba(254, 243, 199, 0.9);
+    }
+
     .stat-card {
         @apply panel relative overflow-hidden p-6;
+    }
+
+    .metric-value {
+        @apply mt-3 text-[1.78rem] font-bold leading-none tracking-tight text-slate-950 sm:text-[1.9rem];
+    }
+
+    .metric-value--strong {
+        @apply mt-3 text-[1.92rem] font-black leading-none tracking-tight text-slate-950 sm:text-[2.05rem];
     }
 
     .stat-card::before {
@@ -241,17 +349,36 @@
         inset: 0;
         background:
             radial-gradient(circle at top right, rgba(204, 216, 230, 0.44), transparent 24%),
-            linear-gradient(180deg, rgba(255, 255, 255, 0.18), transparent 60%);
+            radial-gradient(circle at bottom left, rgba(254, 240, 138, 0.18), transparent 28%),
+            linear-gradient(180deg, rgba(255, 255, 255, 0.2), transparent 60%);
         pointer-events: none;
     }
 
+    .metric-panel {
+        @apply rounded-[1.3rem] border border-slate-200/75 px-4 py-3.5;
+        background:
+            linear-gradient(180deg, rgba(248, 250, 252, 0.84), rgba(255, 255, 255, 0.94));
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.82),
+            0 14px 30px -28px rgba(15, 23, 42, 0.18);
+    }
+
+    .metric-label {
+        @apply text-[0.78rem] font-semibold tracking-[0.06em] text-slate-600;
+        line-height: 1.2;
+    }
+
+    .metric-copy {
+        @apply mt-1.5 text-sm leading-5 text-slate-500;
+    }
+
     .table-shell {
-        @apply overflow-hidden rounded-[2rem] border border-white/80 bg-white/90;
+        @apply overflow-hidden rounded-[1.7rem] border border-white/80 bg-white/90;
         box-shadow: 0 20px 50px -36px rgba(15, 23, 42, 0.22);
     }
 
     .table-header-cell {
-        @apply bg-slate-100/90 px-6 py-4 text-left text-xs font-extrabold uppercase tracking-[0.22em] text-slate-500;
+        @apply bg-slate-100/90 px-5 py-3 text-left text-[0.74rem] font-semibold tracking-[0.08em] text-slate-600;
     }
 
     .table-row {
@@ -259,317 +386,261 @@
     }
 
     .table-cell {
-        @apply px-6 py-4 text-sm text-slate-700;
+        @apply px-5 py-3 text-[0.9rem] text-slate-700;
     }
 
     .empty-state {
-        @apply panel px-8 py-10 text-center text-sm text-slate-500;
+        @apply panel px-6 py-8 text-center text-[0.9rem] text-slate-500;
     }
 
     .inline-link {
-        @apply text-sm font-bold text-slate-700 transition hover:text-slate-950;
+        @apply text-[0.88rem] font-bold text-slate-700 transition hover:text-slate-950;
     }
 
-    .calendar-shell {
-        @apply relative overflow-hidden rounded-[1.9rem] border border-slate-200/90 bg-white/95 p-5;
-        background:
-            radial-gradient(circle at top right, rgba(228, 235, 243, 0.9), transparent 28%),
-            linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.95));
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+    .reservation-booking-grid {
+        @apply grid gap-5 xl:grid-cols-2;
     }
 
-    .calendar-toolbar {
+    .reservation-card {
+        @apply rounded-[1.7rem] border border-white/85 bg-white/90 p-5 sm:p-6;
+        box-shadow:
+            0 22px 54px -38px rgba(41, 88, 184, 0.14),
+            0 12px 26px -22px rgba(15, 23, 42, 0.12);
+    }
+
+    .reservation-card-heading {
         @apply flex items-center justify-between gap-3;
     }
 
-    .calendar-month-badge {
-        @apply flex flex-col items-center text-center;
+    .reservation-card-label {
+        @apply flex items-center gap-2.5;
     }
 
-    .calendar-helper {
-        @apply mt-2 text-xs font-medium text-slate-500 sm:text-sm;
+    .reservation-card-label h2 {
+        @apply text-lg font-bold text-slate-950;
     }
 
-    .calendar-status {
-        @apply rounded-[1.2rem] border border-slate-200/80 bg-white/90 px-4 py-3 text-sm font-medium text-slate-600;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+    .reservation-card-icon {
+        @apply inline-flex h-5 w-5 items-center justify-center text-[rgb(var(--club-brand))];
     }
 
-    .calendar-grid-shell {
-        @apply rounded-[1.7rem] border border-slate-200/80 bg-white/80 p-3 sm:p-4;
-        box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.9),
-            0 18px 38px -34px rgba(15, 23, 42, 0.18);
+    .reservation-card-icon svg {
+        @apply h-full w-full;
     }
 
-    .calendar-weekday {
-        @apply pb-2 text-center text-[0.72rem] font-extrabold uppercase tracking-[0.28em] text-slate-500;
+    .calendar-shell {
+        @apply rounded-[1.55rem] border border-slate-200/85 bg-white px-4 py-4 sm:px-5;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.84);
     }
 
-    .calendar-grid {
-        @apply grid grid-cols-7 gap-2;
+    .calendar-toolbar {
+        @apply grid grid-cols-[2.5rem_1fr_2.5rem] items-center gap-4;
     }
 
-    .calendar-day {
-        @apply relative flex min-h-[4.9rem] flex-col justify-between rounded-[1.35rem] border border-transparent px-3 py-3 text-left transition duration-200;
-        animation: float-in 220ms ease-out;
-        box-shadow: 0 18px 30px -28px rgba(15, 23, 42, 0.2);
+    .calendar-nav-button {
+        @apply inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition duration-200;
+        box-shadow: 0 10px 22px -18px rgba(15, 23, 42, 0.18);
     }
 
-    .calendar-day-content {
-        @apply flex min-h-full flex-col justify-between;
+    .calendar-nav-button:hover {
+        @apply border-slate-300 text-slate-700;
     }
 
-    .calendar-day-number {
-        @apply text-lg font-extrabold leading-none text-slate-900;
-    }
-
-    .calendar-day-caption {
-        @apply mt-3 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-slate-500;
-    }
-
-    .calendar-day.is-other-month {
-        @apply min-h-[4.9rem] border border-dashed border-slate-100 bg-slate-50/30;
+    .calendar-nav-button:disabled {
+        @apply cursor-not-allowed opacity-60;
         box-shadow: none;
     }
 
-    .calendar-day.is-other-month .calendar-day-number {
-        @apply text-slate-300;
+    .calendar-month-label {
+        @apply text-center text-base font-semibold text-slate-950;
+    }
+
+    .calendar-status {
+        @apply min-h-[1.25rem] text-[0.78rem] leading-5 text-slate-500;
+    }
+
+    .calendar-grid-shell {
+        @apply rounded-[1.25rem] border border-slate-100 bg-white px-3 py-3 sm:px-4;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.92);
+    }
+
+    .calendar-weekday {
+        @apply pb-2 text-center text-[0.66rem] font-bold uppercase tracking-[0.16em] text-slate-500;
+    }
+
+    .calendar-grid {
+        @apply grid grid-cols-7 gap-x-2 gap-y-2.5;
+    }
+
+    .calendar-day,
+    .calendar-day-skeleton {
+        @apply grid h-10 w-10 place-items-center justify-self-center rounded-full border text-[0.9rem] font-medium transition duration-200;
+        appearance: none;
+    }
+
+    .calendar-day {
+        animation: float-in 220ms ease-out;
+        border-color: transparent;
+        position: relative;
+        background-color: transparent;
+        box-shadow: none;
+    }
+
+    .calendar-day-number {
+        @apply leading-none;
+    }
+
+    .calendar-day.is-other-month {
+        @apply text-slate-200;
+        opacity: 0.58;
     }
 
     .calendar-day.is-disabled {
-        @apply cursor-not-allowed;
-    }
-
-    .calendar-day.is-disabled:not(.is-other-month) {
-        @apply border-slate-100 bg-slate-50/92;
-    }
-
-    .calendar-day.is-disabled:not(.is-other-month) .calendar-day-number {
-        @apply text-slate-400;
-    }
-
-    .calendar-day.is-disabled:not(.is-other-month) .calendar-day-caption {
-        @apply text-slate-400;
+        @apply cursor-not-allowed text-slate-300;
+        background-color: transparent;
+        border-color: transparent;
+        box-shadow: none;
+        opacity: 1;
     }
 
     .calendar-day.is-available {
-        @apply cursor-pointer border-emerald-100 bg-emerald-50/80;
+        @apply cursor-pointer text-slate-700;
+    }
+
+    .calendar-grid .calendar-day[data-day-state="available"],
+    .calendar-grid .calendar-day[data-day-state="partial"] {
+        @apply text-slate-700;
+        background-color: transparent;
+        border-color: transparent;
+        box-shadow: none;
     }
 
     .calendar-day.is-available:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 24px 38px -26px rgba(16, 185, 129, 0.28);
+        @apply text-slate-900;
+        transform: none;
     }
 
-    .calendar-day.is-partial {
-        @apply cursor-pointer border-amber-100;
-        background:
-            linear-gradient(180deg, rgba(255, 251, 235, 0.98), rgba(245, 240, 231, 0.9));
+    .calendar-grid .calendar-day[data-day-state="available"]:hover,
+    .calendar-grid .calendar-day[data-day-state="partial"]:hover {
+        background-color: rgba(var(--club-brand), 0.06);
+        border-color: transparent;
+        box-shadow: none;
     }
 
-    .calendar-day.is-partial:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 24px 38px -26px rgba(245, 158, 11, 0.22);
+    .calendar-day.is-available:focus-visible {
+        outline: none;
     }
 
-    .calendar-day.is-unavailable {
-        @apply border-slate-100 bg-slate-50/92;
-    }
-
-    .calendar-day.is-today:not(.is-selected) {
-        animation: pulse-soft 2.4s ease-in-out infinite;
+    .calendar-grid .calendar-day[data-day-state="available"]:focus-visible,
+    .calendar-grid .calendar-day[data-day-state="partial"]:focus-visible {
+        border-color: transparent;
+        background-color: rgba(var(--club-brand), 0.08);
         box-shadow:
-            0 0 0 1px rgba(23, 53, 84, 0.14),
-            0 18px 30px -28px rgba(15, 23, 42, 0.2);
+            0 0 0 3px rgba(var(--club-brand), 0.14);
+    }
+
+    .calendar-day.is-today.is-available:not(.is-selected) {
+        @apply text-[rgb(var(--club-brand))];
+        border-color: rgba(var(--club-brand), 0.18);
+        background-color: rgba(var(--club-brand), 0.04);
     }
 
     .calendar-day.is-selected {
-        @apply border-transparent text-white;
-        background: linear-gradient(135deg, rgb(var(--club-brand)), rgb(var(--club-accent)));
-        transform: translateY(-2px) scale(1.01);
-        box-shadow:
-            0 26px 42px -24px rgba(15, 23, 42, 0.46),
-            inset 0 1px 0 rgba(255, 255, 255, 0.18);
+        transform: none;
     }
 
-    .calendar-day.is-selected .calendar-day-number,
-    .calendar-day.is-selected .calendar-day-caption {
+    .calendar-grid .calendar-day[aria-pressed="true"] {
         @apply text-white;
+        background: rgb(var(--club-brand));
+        border-color: rgb(var(--club-brand));
+        box-shadow: none;
+        transform: none;
+        z-index: 1;
     }
 
-    .calendar-day-dot {
-        @apply absolute right-3 top-3 h-2.5 w-2.5 rounded-full;
-        box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.9);
+    .calendar-grid .calendar-day[aria-pressed="true"]::after {
+        display: none;
     }
 
-    .calendar-day.is-available .calendar-day-dot {
-        background-color: rgb(var(--club-success));
+    .calendar-grid .calendar-day[aria-pressed="true"]:hover,
+    .calendar-grid .calendar-day[aria-pressed="true"]:focus-visible {
+        @apply text-white;
+        background: rgb(var(--club-brand));
+        border-color: rgb(var(--club-brand));
+        box-shadow: 0 0 0 3px rgba(var(--club-brand), 0.16);
+        transform: none;
     }
 
-    .calendar-day.is-partial .calendar-day-dot {
-        background-color: rgb(var(--club-warning));
-    }
-
-    .calendar-day.is-unavailable .calendar-day-dot,
-    .calendar-day.is-disabled .calendar-day-dot {
-        background-color: rgb(var(--club-danger));
-        opacity: 0.45;
-    }
-
-    .calendar-legend {
-        @apply flex flex-wrap gap-3 text-xs font-semibold text-slate-500;
-    }
-
-    .calendar-legend-item {
-        @apply inline-flex items-center gap-2;
-    }
-
-    .calendar-legend-swatch {
-        @apply h-2.5 w-2.5 rounded-full;
+    .calendar-day.is-disabled:hover,
+    .calendar-day.is-disabled:focus-visible {
+        transform: none;
+        background-color: transparent;
+        border-color: transparent;
+        box-shadow: none;
     }
 
     .calendar-day-skeleton {
-        @apply min-h-[4.9rem] overflow-hidden rounded-[1.35rem] border border-slate-200/70 bg-slate-100/90;
+        @apply overflow-hidden bg-slate-100;
         position: relative;
     }
 
     .slot-stage {
-        @apply rounded-[1.7rem] border border-slate-200/80 bg-slate-50/70 p-4 sm:p-5;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
+        @apply min-h-[11rem];
     }
 
     .slot-status {
-        @apply text-sm font-semibold text-slate-600;
+        @apply min-h-[1.25rem] text-sm font-medium text-slate-700;
     }
 
     .slot-grid {
-        @apply grid gap-4 sm:grid-cols-2 xl:grid-cols-3;
+        @apply grid grid-cols-2 gap-2.5 border-t border-slate-200/90 pt-4 lg:grid-cols-3;
+    }
+
+    .slot-button,
+    .slot-skeleton {
+        @apply inline-flex min-h-[2.5rem] items-center justify-center rounded-full border border-slate-200 bg-white px-4 py-2 text-[0.92rem] font-medium text-slate-700 transition duration-200;
     }
 
     .slot-button {
-        @apply rounded-[1.45rem] border border-slate-200 bg-white px-4 py-4 text-left transition duration-200;
-        animation: float-in 240ms ease-out;
-        box-shadow:
-            0 20px 34px -30px rgba(15, 23, 42, 0.2),
-            inset 0 1px 0 rgba(255, 255, 255, 0.78);
-    }
-
-    .slot-button-row {
-        @apply flex items-start justify-between gap-3;
+        box-shadow: none;
     }
 
     .slot-button:hover {
-        @apply border-slate-300 bg-slate-50;
-        transform: translateY(-2px);
+        border-color: rgba(var(--club-brand), 0.28);
+        background-color: rgba(var(--club-brand), 0.03);
+        box-shadow: none;
+    }
+
+    .slot-button:focus-visible {
+        outline: none;
+        border-color: rgba(var(--club-brand), 0.4);
+        background-color: rgba(var(--club-brand), 0.04);
+        box-shadow:
+            0 0 0 3px rgba(var(--club-brand), 0.12);
     }
 
     .slot-button.is-selected {
-        @apply border-transparent text-white;
-        background: linear-gradient(135deg, rgb(var(--club-brand)), rgb(var(--club-brand-strong)));
-        box-shadow:
-            0 26px 40px -22px rgba(15, 23, 42, 0.42),
-            inset 0 1px 0 rgba(255, 255, 255, 0.14);
+        @apply text-white;
+        border-color: rgb(var(--club-brand));
+        background: rgb(var(--club-brand));
+        box-shadow: none;
     }
 
-    .slot-button:disabled {
-        @apply cursor-not-allowed border-slate-100 bg-slate-50 text-slate-400 shadow-none;
-        transform: none;
-    }
-
-    .slot-time {
-        font-family: "Fraunces", serif;
-        @apply text-2xl font-semibold leading-none;
-    }
-
-    .slot-duration {
-        @apply mt-2 text-sm font-semibold text-slate-500;
-    }
-
-    .slot-meta {
-        @apply mt-4 text-sm leading-6 text-slate-600;
-    }
-
-    .slot-button.is-selected .slot-duration,
-    .slot-button.is-selected .slot-meta {
-        @apply text-white/85;
-    }
-
-    .slot-badge {
-        @apply inline-flex rounded-full px-3 py-1.5 text-[0.68rem] font-extrabold uppercase tracking-[0.18em];
-    }
-
-    .slot-badge.is-available {
-        @apply text-emerald-700;
-        background-color: rgb(var(--club-success-soft));
-    }
-
-    .slot-badge.is-unavailable {
-        @apply text-rose-700;
-        background-color: rgb(var(--club-danger-soft));
-    }
-
-    .slot-button.is-selected .slot-badge {
-        @apply bg-white/15 text-white;
-    }
-
-    .slot-empty-state {
-        @apply col-span-full flex flex-col rounded-[1.45rem] border border-dashed border-slate-200 bg-white/80 px-5 py-8 text-center;
-    }
-
-    .slot-empty-state strong {
-        @apply text-base font-bold text-slate-800;
-    }
-
-    .slot-empty-state span {
-        @apply mt-2 text-sm text-slate-500;
+    .slot-button.is-selected:hover,
+    .slot-button.is-selected:focus-visible {
+        @apply text-white;
+        border-color: rgb(var(--club-brand));
+        background: rgb(var(--club-brand));
+        box-shadow: 0 0 0 3px rgba(var(--club-brand), 0.14);
     }
 
     .slot-skeleton {
-        @apply overflow-hidden rounded-[1.45rem] border border-slate-200/80 bg-white/90 px-4 py-4;
+        @apply overflow-hidden bg-slate-100 text-transparent;
         position: relative;
-        box-shadow: 0 16px 32px -30px rgba(15, 23, 42, 0.16);
     }
 
-    .slot-skeleton-line {
-        @apply rounded-full bg-slate-200/90;
-        height: 0.8rem;
-        margin-top: 0.75rem;
-    }
-
-    .slot-skeleton-line:first-child {
-        margin-top: 0;
-    }
-
-    .slot-skeleton-line-lg {
-        width: 44%;
-        height: 1.7rem;
-    }
-
-    .slot-skeleton-line-md {
-        width: 72%;
-    }
-
-    .slot-skeleton-line-sm {
-        width: 34%;
-    }
-
-    .selection-summary {
-        @apply rounded-[1.6rem] border border-slate-200/90 p-5;
-        background:
-            linear-gradient(135deg, rgba(241, 245, 249, 0.94), rgba(255, 255, 255, 0.92)),
-            linear-gradient(135deg, rgba(228, 235, 243, 0.45), transparent);
-        box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.88),
-            0 18px 34px -30px rgba(15, 23, 42, 0.16);
-    }
-
-    .summary-label {
-        @apply text-[0.72rem] font-extrabold uppercase tracking-[0.28em] text-slate-600;
-    }
-
-    .summary-value {
-        @apply mt-2 text-base font-bold text-slate-900;
+    .reservation-submit.hidden {
+        display: none;
     }
 
     .shimmer::after {
@@ -581,7 +652,7 @@
     }
 
     .nav-pill {
-        @apply inline-flex items-center rounded-full px-4 py-2.5 text-sm font-bold transition duration-200;
+        @apply inline-flex items-center rounded-full px-3.5 py-2 text-[0.88rem] font-bold transition duration-200;
     }
 
     .nav-pill-active {
@@ -595,24 +666,44 @@
     }
 
     .app-shell {
-        @apply mx-auto flex min-h-screen w-full max-w-[118rem] gap-6 px-4 py-4 sm:px-6 lg:px-6 xl:gap-8;
+        @apply mx-auto flex min-h-screen w-full max-w-[110rem] gap-5 px-3.5 py-3.5 sm:px-5 lg:px-5 xl:gap-6;
     }
 
     .sidebar-panel {
-        @apply panel sticky top-4 flex h-[calc(100vh-2rem)] w-full max-w-[20rem] flex-col overflow-hidden;
+        @apply panel sticky top-3 flex h-[calc(100vh-1.5rem)] w-full max-w-[18.5rem] flex-col overflow-hidden;
     }
 
     .sidebar-panel-mobile {
-        @apply static h-full max-w-none rounded-[2rem];
+        @apply static h-full max-w-none rounded-[1.7rem];
     }
 
     .sidebar-panel__inner {
-        @apply flex h-full flex-col gap-6 overflow-y-auto px-4 py-4 sm:px-5;
+        @apply flex h-full flex-col gap-5 overflow-y-auto px-4 py-3.5 sm:px-4;
     }
 
     .sidebar-context {
-        @apply rounded-[1.7rem] border border-slate-200/80 bg-slate-100/80 px-4 py-4;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+        @apply rounded-[1.3rem] border border-amber-100/80 px-3.5 py-3;
+        background:
+            linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 248, 228, 0.92));
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.76),
+            0 16px 34px -30px rgba(15, 23, 42, 0.18);
+    }
+
+    .sidebar-context__eyebrow {
+        @apply flex items-center justify-between gap-2;
+    }
+
+    .sidebar-context__badge {
+        @apply inline-flex items-center rounded-full border border-amber-200/80 bg-white/90 px-2.5 py-1 text-[0.62rem] font-extrabold uppercase tracking-[0.16em] text-slate-600;
+    }
+
+    .sidebar-context__title {
+        @apply mt-2 text-base font-black text-slate-950;
+    }
+
+    .sidebar-context__subtitle {
+        @apply mt-1 text-sm text-slate-500;
     }
 
     .sidebar-nav-section {
@@ -620,11 +711,11 @@
     }
 
     .sidebar-nav {
-        @apply mt-4 flex flex-col gap-2;
+        @apply mt-3 flex flex-col gap-1.5;
     }
 
     .sidebar-link {
-        @apply inline-flex items-center justify-between rounded-[1.35rem] px-4 py-3 text-sm font-bold transition duration-200;
+        @apply inline-flex items-center justify-between rounded-[1.1rem] px-3.5 py-2.5 text-[0.9rem] font-bold transition duration-200;
     }
 
     .sidebar-link-active {
@@ -642,32 +733,32 @@
     }
 
     .sidebar-user-card {
-        @apply rounded-[1.7rem] border border-slate-200/80 bg-white/80 px-4 py-4;
+        @apply rounded-[1.45rem] border border-slate-200/80 bg-white/80 px-3.5 py-3.5;
         box-shadow:
             0 18px 38px -30px rgba(15, 23, 42, 0.18),
             inset 0 1px 0 rgba(255, 255, 255, 0.68);
     }
 
     .sidebar-close {
-        @apply inline-flex h-11 w-11 items-center justify-center rounded-[1.2rem] border border-slate-200 bg-white/90 text-slate-600 transition duration-200 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-950;
+        @apply inline-flex h-10 w-10 items-center justify-center rounded-[1rem] border border-slate-200 bg-white/90 text-slate-600 transition duration-200 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-950;
         box-shadow: 0 16px 30px -28px rgba(15, 23, 42, 0.22);
     }
 
     .mobile-topbar {
-        @apply panel mb-4 flex items-center gap-3 px-4 py-3 sm:px-5 lg:hidden;
+        @apply panel mb-3 flex items-center gap-2.5 px-3.5 py-2.5 sm:px-4 lg:hidden;
     }
 
     .mobile-topbar__menu {
-        @apply inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-[1.3rem] border border-slate-200 bg-white/90 text-slate-700 transition duration-200 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-950;
+        @apply inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[1rem] border border-slate-200 bg-white/90 text-slate-700 transition duration-200 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-950;
         box-shadow: 0 16px 34px -28px rgba(15, 23, 42, 0.24);
     }
 
     .mobile-topbar__eyebrow {
-        @apply text-[0.68rem] font-extrabold uppercase tracking-[0.28em] text-slate-500;
+        @apply text-[0.62rem] font-extrabold uppercase tracking-[0.22em] text-slate-500;
     }
 
     .mobile-topbar__title {
-        @apply mt-1 text-sm font-bold text-slate-950;
+        @apply mt-0.5 text-[0.9rem] font-bold text-slate-950;
     }
 
     .mobile-sidebar-overlay {
@@ -675,24 +766,25 @@
     }
 
     .mobile-sidebar {
-        @apply fixed inset-y-0 left-0 z-50 w-[min(22rem,calc(100vw-1.5rem))] p-3;
+        @apply fixed inset-y-0 left-0 z-50 w-[min(20rem,calc(100vw-1.25rem))] p-2.5;
     }
 
     .nav-section-shell {
-        @apply rounded-[1.6rem] border border-slate-200/80 bg-slate-100/70 p-3;
+        @apply rounded-[1.35rem] border border-slate-200/80 bg-slate-100/70 p-2.5;
     }
 
     .nav-section-label {
-        @apply text-[0.68rem] font-extrabold uppercase tracking-[0.28em] text-slate-600;
+        @apply text-[0.72rem] font-semibold tracking-[0.08em] text-slate-600;
     }
 
     .context-card {
-        @apply rounded-[1.6rem] border border-slate-200/80 bg-slate-100/80 px-4 py-4;
+        @apply rounded-[1.35rem] border border-amber-100/80 px-3.5 py-3.5;
+        background-color: rgba(var(--club-surface-soft), 0.88);
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.68);
     }
 
     .hero-stat {
-        @apply rounded-[1.6rem] border border-white/10 bg-white/10 px-4 py-4 backdrop-blur-sm;
+        @apply rounded-[1.35rem] border border-white/10 bg-white/10 px-3.5 py-3.5 backdrop-blur-sm;
     }
 
     .analytics-track {
@@ -717,44 +809,56 @@
     }
 
     .chart-shell {
-        @apply relative overflow-hidden rounded-[1.75rem] border border-slate-200/80 bg-slate-50/75 p-4;
-        min-height: 320px;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
+        @apply relative overflow-hidden rounded-[1.35rem] border border-slate-200/80 bg-white/90 p-3;
+        min-height: 196px;
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.78),
+            0 16px 34px -30px rgba(15, 23, 42, 0.14);
     }
 
     .chart-shell.chart-shell-compact {
-        min-height: 260px;
+        min-height: 160px;
+    }
+
+    .chart-shell.chart-shell-donut {
+        height: clamp(15rem, 24vw, 18rem);
+        min-height: 15rem;
+    }
+
+    .chart-shell.chart-shell-mini {
+        min-height: 132px;
     }
 
     .chart-shell canvas {
         @apply h-full w-full;
+        max-height: 100% !important;
     }
 
     .branch-tab-nav {
-        @apply flex flex-wrap gap-2 rounded-[1.8rem] border border-white/80 bg-white/90 p-3;
-        box-shadow: 0 20px 50px -36px rgba(76, 29, 149, 0.28);
+        @apply flex flex-wrap gap-2 rounded-[1.5rem] border border-white/80 bg-white/90 p-2.5;
+        box-shadow: 0 20px 50px -36px rgba(242, 207, 47, 0.24);
     }
 
     .branch-tab-link {
-        @apply inline-flex items-center rounded-[1.2rem] px-4 py-3 text-sm font-bold text-slate-600 transition duration-200 hover:bg-slate-100 hover:text-slate-900;
+        @apply inline-flex items-center rounded-[1rem] px-3.5 py-2.5 text-[0.9rem] font-bold text-slate-600 transition duration-200 hover:bg-slate-100 hover:text-slate-900;
     }
 
     .branch-tab-link-active {
-        @apply inline-flex items-center rounded-[1.2rem] px-4 py-3 text-sm font-bold text-white;
-        background: linear-gradient(135deg, rgb(var(--club-brand)), rgb(var(--club-accent)));
-        box-shadow: 0 18px 32px -22px rgba(124, 58, 237, 0.64);
+        @apply inline-flex items-center rounded-[1rem] px-3.5 py-2.5 text-[0.9rem] font-bold text-white;
+        background: linear-gradient(135deg, rgb(var(--club-brand)), rgb(var(--club-brand-strong)));
+        box-shadow: 0 18px 32px -22px rgba(41, 88, 184, 0.38);
     }
 
     .branch-highlight-card {
-        @apply rounded-[1.65rem] border border-white/10 bg-white/10 p-5 text-white backdrop-blur-sm;
+        @apply rounded-[1.4rem] border border-white/10 bg-white/10 p-4 text-white backdrop-blur-sm;
     }
 
     .insight-list {
-        @apply space-y-3;
+        @apply space-y-2.5;
     }
 
     .insight-row {
-        @apply flex items-start justify-between gap-4 rounded-[1.35rem] border border-slate-100 bg-white/70 px-4 py-4 text-sm text-slate-700;
+        @apply flex items-start justify-between gap-3 rounded-[1rem] border border-slate-100 bg-white/80 px-3.5 py-2.5 text-[0.88rem] text-slate-700;
     }
 
     .insight-row strong {
@@ -765,21 +869,167 @@
         @apply border-t border-slate-200/80;
     }
 
+    .dashboard-card-spotlight {
+        @apply flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between;
+    }
+
+    .dashboard-card-spotlight__intro {
+        @apply max-w-md;
+    }
+
+    .finance-summary-grid {
+        @apply grid gap-4 md:grid-cols-2 xl:grid-cols-4;
+    }
+
+    .finance-kpi-card {
+        @apply panel relative overflow-hidden p-5;
+    }
+
+    .finance-kpi-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            radial-gradient(circle at top right, rgba(242, 207, 47, 0.2), transparent 22%),
+            linear-gradient(180deg, rgba(255, 255, 255, 0.14), transparent 60%);
+        pointer-events: none;
+    }
+
+    .finance-status-pill {
+        @apply inline-flex items-center rounded-full px-3 py-1 text-[0.7rem] font-extrabold uppercase tracking-[0.16em];
+    }
+
+    .finance-status-pill--pending {
+        @apply finance-status-pill text-amber-800;
+        background-color: rgba(254, 243, 199, 0.95);
+    }
+
+    .finance-status-pill--paid {
+        @apply finance-status-pill text-emerald-800;
+        background-color: rgba(220, 252, 231, 0.95);
+    }
+
+    .finance-status-pill--overdue {
+        @apply finance-status-pill text-rose-800;
+        background-color: rgba(254, 226, 226, 0.95);
+    }
+
+    .finance-history-card {
+        @apply rounded-[1.45rem] border border-slate-200/80 p-5;
+        background-color: rgba(255, 255, 255, 0.92);
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.82),
+            0 18px 36px -32px rgba(15, 23, 42, 0.16);
+    }
+
+    .enrollment-shell {
+        @apply mx-auto flex min-h-screen w-full max-w-6xl items-center px-4 py-5 sm:px-6 lg:px-8;
+    }
+
+    .enrollment-steps {
+        @apply mt-6 grid gap-3;
+    }
+
+    .enrollment-step {
+        @apply rounded-[1.3rem] border border-white/15 bg-white/10 px-4 py-3 text-sm backdrop-blur-sm;
+        color: rgba(255, 255, 255, 0.88);
+    }
+
+    .inventory-accordion {
+        @apply rounded-[1.45rem] border border-slate-200/80;
+        background-color: rgba(255, 255, 255, 0.92);
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.82),
+            0 16px 34px -30px rgba(15, 23, 42, 0.14);
+    }
+
+    .inventory-accordion__summary {
+        @apply flex cursor-pointer list-none items-start justify-between gap-4 px-5 py-4;
+    }
+
+    .inventory-accordion__summary::-webkit-details-marker {
+        display: none;
+    }
+
+    .inventory-accordion__body {
+        @apply border-t border-slate-200/80 px-5 py-5;
+    }
+
+    .inventory-category-header {
+        @apply flex flex-col gap-3 border-b border-amber-100/80 pb-4 sm:flex-row sm:items-center sm:justify-between;
+    }
+
     .membership-card-stack {
-        @apply space-y-5;
+        @apply space-y-3;
     }
 
     .membership-card-grid {
-        @apply grid gap-5 xl:grid-cols-2;
+        @apply grid gap-4 xl:grid-cols-2;
+    }
+
+    .membership-card-scene {
+        width: min(100%, 34rem);
+        position: relative;
+        isolation: isolate;
+        -webkit-perspective: 1800px;
+        perspective: 1800px;
+        perspective-origin: center center;
+    }
+
+    .membership-card-scene--public {
+        width: min(100%, 27rem);
+    }
+
+    .membership-card-toggle {
+        @apply block w-full rounded-[1.7rem];
+        cursor: pointer;
+        outline: none;
+    }
+
+    .membership-card-toggle:focus-visible {
+        box-shadow:
+            0 0 0 1px rgba(41, 88, 184, 0.38),
+            0 0 0 4px rgba(41, 88, 184, 0.14);
+    }
+
+    .membership-card-flipper {
+        position: relative;
+        min-height: 20rem;
+        -webkit-transform-style: preserve-3d;
+        transform-style: preserve-3d;
+        transition: transform 720ms cubic-bezier(0.22, 1, 0.36, 1);
+        will-change: transform;
+    }
+
+    .membership-card-scene.is-flipped .membership-card-flipper {
+        transform: rotateY(180deg);
     }
 
     .membership-card-face {
-        @apply relative overflow-hidden rounded-[2rem] border border-white/15 p-6 text-white sm:p-7;
+        @apply relative overflow-hidden rounded-[1.7rem] border p-4 text-white sm:p-5;
         aspect-ratio: 1.58 / 1;
-        min-height: 22rem;
+        min-height: 20rem;
+        border-color: rgba(255, 255, 255, 0.15);
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+        -webkit-transform-style: preserve-3d;
+        transform-style: preserve-3d;
         box-shadow:
-            0 30px 72px -42px rgba(15, 23, 42, 0.55),
+            0 28px 60px -42px rgba(41, 88, 184, 0.32),
             inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    }
+
+    .membership-card-flipper > .membership-card-face {
+        position: absolute;
+        inset: 0;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+
+    .membership-card-face,
+    .membership-card-face * {
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
     }
 
     .membership-card-face::before {
@@ -793,41 +1043,50 @@
     }
 
     .membership-card-face--front {
+        z-index: 2;
+        transform: rotateY(0deg) translateZ(1px);
+        -webkit-transform: rotateY(0deg) translateZ(1px);
         background:
-            radial-gradient(circle at top left, rgba(255, 255, 255, 0.16), transparent 34%),
-            radial-gradient(circle at bottom right, rgba(201, 166, 98, 0.22), transparent 24%),
-            linear-gradient(145deg, rgba(17, 24, 39, 0.98), rgba(23, 53, 84, 0.98) 58%, rgba(109, 76, 30, 0.96));
+            radial-gradient(circle at top left, rgba(255, 255, 255, 0.24), transparent 34%),
+            radial-gradient(circle at bottom right, rgba(242, 207, 47, 0.32), transparent 26%),
+            linear-gradient(145deg, rgba(41, 88, 184, 0.98), rgba(78, 121, 204, 0.95) 56%, rgba(242, 207, 47, 0.76));
     }
 
     .membership-card-face--back {
+        z-index: 1;
         background:
-            radial-gradient(circle at top left, rgba(255, 255, 255, 0.2), transparent 28%),
-            radial-gradient(circle at bottom right, rgba(209, 213, 219, 0.16), transparent 22%),
-            linear-gradient(145deg, rgba(24, 24, 27, 0.98), rgba(51, 65, 85, 0.98) 54%, rgba(23, 53, 84, 0.96));
+            radial-gradient(circle at top left, rgba(255, 255, 255, 0.24), transparent 28%),
+            radial-gradient(circle at bottom right, rgba(242, 207, 47, 0.22), transparent 24%),
+            linear-gradient(145deg, rgba(55, 100, 187, 0.96), rgba(120, 151, 219, 0.94) 54%, rgba(242, 207, 47, 0.66));
+    }
+
+    .membership-card-flipper > .membership-card-face--back {
+        transform: rotateY(180deg) translateZ(1px);
+        -webkit-transform: rotateY(180deg) translateZ(1px);
     }
 
     .membership-card-face__glow {
-        @apply absolute -right-16 -top-16 h-44 w-44 rounded-full;
+        @apply absolute -right-12 -top-12 h-32 w-32 rounded-full;
         background: radial-gradient(circle, rgba(255, 255, 255, 0.22), transparent 68%);
         filter: blur(6px);
         pointer-events: none;
     }
 
     .membership-card-face__header {
-        @apply relative z-10 flex items-start justify-between gap-4;
+        @apply relative z-10 flex items-start justify-between gap-3;
     }
 
     .membership-card-face__eyebrow {
-        @apply text-[0.68rem] font-extrabold uppercase tracking-[0.32em];
+        @apply text-[0.58rem] font-extrabold uppercase tracking-[0.26em];
         color: rgba(255, 255, 255, 0.65);
     }
 
     .membership-card-brand {
-        @apply mt-2 text-base font-bold text-white;
+        @apply mt-1 text-[0.82rem] font-bold text-white sm:text-[0.92rem];
     }
 
     .membership-card-type {
-        @apply inline-flex items-center rounded-full px-4 py-2 text-[0.68rem] font-extrabold uppercase tracking-[0.24em];
+        @apply inline-flex items-center rounded-full px-3 py-1 text-[0.56rem] font-extrabold uppercase tracking-[0.2em];
         border: 1px solid rgba(255, 255, 255, 0.15);
         background-color: rgba(255, 255, 255, 0.1);
         color: rgba(255, 255, 255, 0.8);
@@ -840,11 +1099,11 @@
     }
 
     .membership-card-front__body {
-        @apply relative z-10 mt-6 grid gap-5 md:grid-cols-[auto_1fr] md:items-start;
+        @apply relative z-10 mt-4 grid grid-cols-[1fr_auto] gap-3 items-start;
     }
 
     .membership-card-chip {
-        @apply h-12 w-16 rounded-[1rem];
+        @apply h-10 w-14 rounded-[0.9rem];
         border: 1px solid rgba(255, 255, 255, 0.15);
         background:
             linear-gradient(135deg, rgba(255, 240, 199, 0.95), rgba(184, 142, 73, 0.86)),
@@ -855,9 +1114,10 @@
     }
 
     .membership-card-photo {
-        @apply h-28 w-24 overflow-hidden rounded-[1.6rem] shadow-2xl sm:h-32 sm:w-28;
+        @apply h-20 w-[4.4rem] overflow-hidden rounded-[1.2rem] shadow-2xl sm:h-24 sm:w-20;
         border: 1px solid rgba(255, 255, 255, 0.15);
         background-color: rgba(255, 255, 255, 0.1);
+        justify-self: end;
     }
 
     .membership-card-photo__image {
@@ -865,7 +1125,7 @@
     }
 
     .membership-card-photo__placeholder {
-        @apply flex h-full w-full items-center justify-center text-3xl font-extrabold text-white;
+        @apply flex h-full w-full items-center justify-center text-[1.65rem] font-extrabold text-white;
         background: linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.05));
     }
 
@@ -874,21 +1134,21 @@
     }
 
     .membership-card-name {
-        font-family: "Fraunces", serif;
-        @apply mt-2 text-3xl font-semibold leading-tight text-white sm:text-[2rem];
+        @apply mt-1 text-[1.65rem] font-semibold leading-[0.98] text-white sm:text-[1.95rem];
+        overflow-wrap: anywhere;
     }
 
     .membership-card-number {
-        font-family: "Fraunces", serif;
-        @apply mt-4 text-2xl font-semibold tracking-[0.18em] text-white sm:text-[2rem];
+        @apply mt-2 text-[1rem] font-semibold tracking-[0.08em] text-white sm:text-[1.35rem];
+        overflow-wrap: anywhere;
     }
 
     .membership-card-meta-grid {
-        @apply mt-5 grid gap-3 sm:grid-cols-2;
+        @apply mt-3 grid gap-2 sm:grid-cols-2;
     }
 
     .membership-card-meta {
-        @apply rounded-[1.25rem] px-4 py-3;
+        @apply rounded-[1rem] px-3 py-2.5;
         border: 1px solid rgba(255, 255, 255, 0.1);
         background-color: rgba(255, 255, 255, 0.1);
         backdrop-filter: blur(12px);
@@ -899,21 +1159,22 @@
     }
 
     .membership-card-label {
-        @apply text-[0.68rem] font-extrabold uppercase tracking-[0.24em];
+        @apply text-[0.58rem] font-extrabold uppercase tracking-[0.2em];
         color: rgba(255, 255, 255, 0.58);
     }
 
     .membership-card-value {
-        @apply mt-2 text-sm font-semibold leading-6;
+        @apply mt-1 text-[0.84rem] font-semibold leading-5;
         color: rgba(255, 255, 255, 0.92);
+        overflow-wrap: anywhere;
     }
 
     .membership-card-front__footer {
-        @apply relative z-10 mt-5 flex flex-col gap-4 border-t border-white/10 pt-4 sm:flex-row sm:items-end sm:justify-between;
+        @apply relative z-10 mt-3 flex flex-col gap-2.5 border-t border-white/10 pt-3 sm:flex-row sm:items-center sm:justify-between;
     }
 
     .membership-card-status-badge {
-        @apply inline-flex items-center self-start rounded-full px-4 py-2 text-xs font-extrabold uppercase tracking-[0.22em];
+        @apply inline-flex items-center self-start rounded-full px-3 py-1 text-[0.56rem] font-extrabold uppercase tracking-[0.2em];
     }
 
     .membership-card-status-badge--success {
@@ -937,52 +1198,107 @@
     }
 
     .membership-card-strip {
-        @apply absolute left-0 right-0 top-8 h-14;
-        background: linear-gradient(180deg, rgba(15, 23, 42, 0.92), rgba(15, 23, 42, 0.7));
+        @apply absolute left-0 right-0 top-5 h-8;
+        background: linear-gradient(180deg, rgba(26, 58, 132, 0.88), rgba(26, 58, 132, 0.68));
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
     }
 
     .membership-card-back__body {
-        @apply relative z-10 mt-20 grid gap-5 md:grid-cols-[auto_1fr] md:items-center;
+        @apply relative z-10 mt-8 grid gap-3 md:grid-cols-[7.5rem_1fr] md:items-start;
+    }
+
+    .membership-card-back__body--public {
+        @apply mt-3 grid-cols-1;
+    }
+
+    .membership-card-back__body--compact {
+        @apply mt-5 gap-2;
+        grid-template-columns: 6.65rem minmax(0, 1fr);
+        align-items: start;
     }
 
     .membership-card-qr-shell {
-        @apply flex items-center justify-center rounded-[1.7rem] p-4 shadow-2xl;
+        @apply flex items-center justify-center rounded-[1.25rem] p-2.5 shadow-2xl;
         border: 1px solid rgba(255, 255, 255, 0.12);
         background-color: rgba(255, 255, 255, 0.92);
-        min-height: 12rem;
-        min-width: 12rem;
+        min-height: 7.5rem;
+        min-width: 7.5rem;
     }
 
     .membership-card-qr {
-        @apply flex h-full w-full items-center justify-center text-center text-sm font-bold text-slate-900;
+        @apply flex h-full w-full items-center justify-center text-center text-[0.88rem] font-bold text-slate-900;
     }
 
     .membership-card-qr svg {
         width: 100%;
         height: auto;
-        max-width: 10rem;
+        max-width: 6.2rem;
     }
 
     .membership-card-qr--placeholder {
-        @apply rounded-[1.3rem] border border-dashed border-slate-300 bg-slate-100 px-4 py-8 text-slate-500;
+        @apply rounded-[1.1rem] border border-dashed border-slate-300 bg-slate-100 px-3 py-6 text-[0.88rem] text-slate-500;
     }
 
     .membership-card-back__content {
-        @apply flex flex-col gap-4;
+        @apply flex flex-col gap-3;
+    }
+
+    .membership-card-back__content--compact {
+        gap: 0.75rem;
+    }
+
+    .membership-card-back__summary {
+        max-width: 15rem;
     }
 
     .membership-card-instruction {
-        @apply mt-3 text-sm leading-7;
+        @apply mt-1.5 text-[0.86rem] leading-5;
         color: rgba(255, 255, 255, 0.78);
     }
 
     .membership-card-back__meta {
-        @apply grid gap-3 sm:grid-cols-2;
+        @apply grid gap-2 sm:grid-cols-2;
+    }
+
+    .membership-card-back__meta--compact {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.55rem;
+    }
+
+    .membership-card-back__meta--compact .membership-card-meta {
+        padding: 0.7rem 0.8rem;
+        border-radius: 0.9rem;
+    }
+
+    .membership-card-back__content--compact .membership-card-instruction {
+        margin-top: 0.3rem;
+        font-size: 0.75rem;
+        line-height: 1.25;
+    }
+
+    .membership-card-back__meta--compact .membership-card-value {
+        margin-top: 0.25rem;
+        font-size: 0.84rem;
+        line-height: 1.2;
+    }
+
+    .membership-card-back__body--compact .membership-card-qr-shell {
+        min-height: 6.65rem;
+        min-width: 6.65rem;
+        padding: 0.75rem;
+        border-radius: 1rem;
+    }
+
+    .membership-card-back__body--compact .membership-card-qr svg {
+        max-width: 5.15rem;
+    }
+
+    .membership-card-back__meta--public {
+        @apply sm:grid-cols-2;
     }
 
     .membership-card-validation-link {
-        @apply inline-flex items-center justify-center self-start rounded-full px-4 py-2.5 text-sm font-bold text-white transition duration-200;
+        @apply inline-flex items-center justify-center self-start rounded-full px-3.5 py-1.5 text-[0.84rem] font-bold text-white transition duration-200;
         border: 1px solid rgba(255, 255, 255, 0.15);
         background-color: rgba(255, 255, 255, 0.1);
         backdrop-filter: blur(12px);
@@ -992,15 +1308,55 @@
         background-color: rgba(255, 255, 255, 0.15);
     }
 
+    .membership-card-validation-link--external {
+        margin-top: 0.85rem;
+    }
+
+    .membership-card-flip-pill,
+    .membership-card-back__stamp {
+        @apply inline-flex items-center justify-center self-start rounded-full px-3 py-1 text-[0.56rem] font-extrabold uppercase tracking-[0.2em];
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background-color: rgba(255, 255, 255, 0.12);
+        color: rgba(255, 255, 255, 0.88);
+        backdrop-filter: blur(12px);
+    }
+
+    .membership-card-flip-hint {
+        @apply mt-2.5 text-center text-[0.72rem] font-semibold text-slate-500;
+    }
+
+    .membership-card-public-page {
+        min-height: 100vh;
+        background-color: rgb(var(--club-surface-soft));
+        background-image:
+            radial-gradient(circle at top, rgba(255, 231, 138, 0.32), transparent 30%),
+            radial-gradient(circle at bottom, rgba(198, 216, 250, 0.22), transparent 28%),
+            linear-gradient(180deg, rgba(255, 251, 240, 0.98), rgba(255, 255, 255, 0.96));
+    }
+
+    .membership-card-public-shell {
+        min-height: 100vh;
+        @apply mx-auto flex w-full items-center justify-center px-4 py-5 sm:px-6;
+    }
+
+    .membership-card-public-shell .membership-card-stack {
+        width: min(100%, 29rem);
+    }
+
+    .membership-card-toggle--public {
+        display: block;
+        -webkit-tap-highlight-color: transparent;
+    }
+
     .profile-shell {
-        @apply rounded-[2rem] border border-white/80 bg-white/90 p-4 sm:p-6;
+        @apply rounded-[1.7rem] border border-white/80 bg-white/90 p-4 sm:p-5;
         box-shadow:
-            0 20px 56px -38px rgba(76, 29, 149, 0.24),
+            0 20px 56px -38px rgba(242, 207, 47, 0.18),
             inset 0 1px 0 rgba(255, 255, 255, 0.76);
     }
 
     .profile-shell__header {
-        @apply flex flex-col gap-5 border-b border-violet-100/90 pb-5;
+        @apply flex flex-col gap-4 border-b border-slate-200/90 pb-4;
     }
 
     .profile-tabs {
@@ -1013,24 +1369,24 @@
     }
 
     .profile-tab {
-        @apply inline-flex shrink-0 items-center justify-center rounded-full border border-violet-100 bg-white/90 px-4 py-2.5 text-sm font-bold text-slate-600 transition duration-200 hover:border-violet-200 hover:bg-violet-50/80 hover:text-slate-900;
-        box-shadow: 0 14px 28px -26px rgba(76, 29, 149, 0.26);
+        @apply inline-flex shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white/90 px-3.5 py-2 text-[0.88rem] font-bold text-slate-600 transition duration-200 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900;
+        box-shadow: 0 14px 28px -26px rgba(242, 207, 47, 0.16);
     }
 
     .profile-tab.is-active {
         @apply border-transparent text-white;
-        background: linear-gradient(135deg, rgb(var(--club-brand)), rgb(var(--club-accent)));
-        box-shadow: 0 18px 34px -20px rgba(124, 58, 237, 0.52);
+        background: linear-gradient(135deg, rgb(var(--club-brand)), rgb(var(--club-brand-strong)));
+        box-shadow: 0 18px 34px -20px rgba(41, 88, 184, 0.36);
     }
 
     .profile-tab-panel {
-        @apply pt-6;
+        @apply pt-5;
     }
 
     .club-hero {
-        @apply relative min-h-[28rem] overflow-hidden rounded-[2.8rem];
-        height: min(70vh, 52rem);
-        box-shadow: 0 34px 80px -46px rgba(15, 23, 42, 0.5);
+        @apply relative min-h-[24rem] overflow-hidden rounded-[2.2rem];
+        height: min(62vh, 46rem);
+        box-shadow: 0 34px 80px -46px rgba(41, 88, 184, 0.22);
     }
 
     .club-hero__image {
@@ -1040,30 +1396,30 @@
     .club-hero__overlay {
         @apply absolute inset-0;
         background:
-            linear-gradient(180deg, rgba(15, 23, 42, 0.08), rgba(15, 23, 42, 0.34)),
-            linear-gradient(90deg, rgba(15, 23, 42, 0.72), rgba(15, 23, 42, 0.18) 58%, rgba(15, 23, 42, 0.28));
+            linear-gradient(180deg, rgba(16, 36, 84, 0.04), rgba(16, 36, 84, 0.18)),
+            linear-gradient(90deg, rgba(24, 54, 124, 0.5), rgba(24, 54, 124, 0.12) 56%, rgba(242, 207, 47, 0.18));
     }
 
     .club-hero__overlay--placeholder {
         background:
-            linear-gradient(180deg, rgba(15, 23, 42, 0.12), rgba(15, 23, 42, 0.4)),
-            linear-gradient(90deg, rgba(15, 23, 42, 0.62), rgba(15, 23, 42, 0.18) 64%, rgba(15, 23, 42, 0.34));
+            linear-gradient(180deg, rgba(24, 54, 124, 0.08), rgba(24, 54, 124, 0.22)),
+            linear-gradient(90deg, rgba(24, 54, 124, 0.44), rgba(24, 54, 124, 0.12) 60%, rgba(242, 207, 47, 0.26));
     }
 
     .club-hero__content {
-        @apply relative flex h-full items-end p-6 sm:p-10 lg:p-14;
+        @apply relative flex h-full items-end p-5 sm:p-8 lg:p-10;
     }
 
     .club-hero__placeholder {
-        @apply absolute inset-0 flex items-start justify-end p-6 sm:p-10;
+        @apply absolute inset-0 flex items-start justify-end p-5 sm:p-8;
         background:
-            radial-gradient(circle at top left, rgba(255, 255, 255, 0.22), transparent 28%),
-            radial-gradient(circle at bottom right, rgba(171, 141, 89, 0.32), transparent 26%),
-            linear-gradient(135deg, rgba(23, 53, 84, 0.94), rgba(15, 39, 64, 0.84), rgba(31, 41, 55, 0.9));
+            radial-gradient(circle at top left, rgba(255, 255, 255, 0.28), transparent 28%),
+            radial-gradient(circle at bottom right, rgba(242, 207, 47, 0.36), transparent 26%),
+            linear-gradient(135deg, rgba(41, 88, 184, 0.9), rgba(78, 121, 204, 0.82), rgba(255, 245, 214, 0.42));
     }
 
     .club-hero__placeholder-badge {
-        @apply inline-flex items-center rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-extrabold uppercase tracking-[0.22em] text-white/80 backdrop-blur-sm;
+        @apply inline-flex items-center rounded-full border border-white/15 bg-white/10 px-3.5 py-1.5 text-[0.7rem] font-extrabold uppercase tracking-[0.2em] text-white/80 backdrop-blur-sm;
     }
 
     .club-gallery {
@@ -1073,7 +1429,7 @@
 
     .club-gallery__item {
         @apply relative overflow-hidden rounded-[2rem];
-        box-shadow: 0 26px 50px -38px rgba(15, 23, 42, 0.38);
+        box-shadow: 0 26px 50px -38px rgba(41, 88, 184, 0.18);
     }
 
     .club-gallery__item--featured {
@@ -1090,54 +1446,67 @@
     }
 
     .club-gallery__placeholder {
-        @apply flex h-full min-h-[220px] w-full items-end p-5 text-white;
+        @apply flex h-full min-h-[220px] w-full items-end p-5 text-slate-900;
         background:
-            linear-gradient(145deg, rgba(23, 53, 84, 0.96), rgba(15, 39, 64, 0.8)),
-            linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 46%);
+            radial-gradient(circle at top left, rgba(255, 255, 255, 0.78), transparent 30%),
+            radial-gradient(circle at bottom right, rgba(242, 207, 47, 0.34), transparent 28%),
+            linear-gradient(145deg, rgba(255, 250, 237, 0.96), rgba(236, 242, 255, 0.92));
     }
 
     .club-gallery__placeholder span {
-        @apply inline-flex rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-extrabold uppercase tracking-[0.18em] backdrop-blur-sm;
+        @apply inline-flex rounded-full border border-amber-200/70 bg-white/75 px-4 py-2 text-xs font-extrabold uppercase tracking-[0.18em] text-slate-800 backdrop-blur-sm;
     }
 
     .club-gallery__caption {
         @apply absolute inset-x-0 bottom-0 px-5 py-4 text-sm font-semibold text-white;
-        background: linear-gradient(180deg, rgba(15, 23, 42, 0), rgba(15, 23, 42, 0.72));
+        background: linear-gradient(180deg, rgba(24, 54, 124, 0), rgba(24, 54, 124, 0.68));
     }
 
     .club-unit-card {
-        @apply flex h-full flex-col justify-between rounded-[2rem] border border-white/70 bg-white/90 p-6;
+        @apply flex h-full flex-col justify-between rounded-[1.7rem] border border-white/70 bg-white/90 p-5;
         box-shadow: 0 22px 48px -38px rgba(15, 23, 42, 0.22);
     }
 
     .club-plan-card {
-        @apply relative rounded-[2.2rem] border border-white/80 bg-white/90 p-6;
-        box-shadow: 0 26px 54px -42px rgba(15, 23, 42, 0.26);
+        @apply relative rounded-[1.8rem] border border-white/80 bg-white/90 p-5;
+        box-shadow: 0 26px 54px -42px rgba(41, 88, 184, 0.12);
     }
 
     .club-plan-card--recommended {
-        @apply border-white/10 text-white;
+        @apply border-amber-200/90 text-slate-900;
         background:
-            radial-gradient(circle at top left, rgba(255, 255, 255, 0.12), transparent 32%),
-            radial-gradient(circle at bottom right, rgba(196, 167, 112, 0.18), transparent 26%),
-            linear-gradient(160deg, rgba(23, 53, 84, 0.98), rgba(15, 39, 64, 0.98));
-        box-shadow: 0 34px 74px -46px rgba(15, 23, 42, 0.54);
+            radial-gradient(circle at top left, rgba(255, 255, 255, 0.72), transparent 30%),
+            radial-gradient(circle at bottom right, rgba(242, 207, 47, 0.26), transparent 28%),
+            linear-gradient(160deg, rgba(255, 250, 237, 0.98), rgba(236, 242, 255, 0.96));
+        box-shadow: 0 30px 60px -42px rgba(242, 207, 47, 0.26);
     }
 
     .club-plan-card__badge {
-        @apply absolute right-5 top-5 rounded-full bg-white/15 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-white;
+        @apply absolute right-4 top-4 rounded-full px-2.5 py-1 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-slate-900;
+        background: linear-gradient(135deg, rgba(255, 234, 138, 0.98), rgba(242, 207, 47, 0.92));
     }
 
     .club-plan-card__benefit {
-        @apply rounded-[1.35rem] border border-slate-200 bg-slate-50/80 px-4 py-3 text-sm text-slate-700;
+        @apply rounded-[1.1rem] border border-slate-200 bg-slate-50/80 px-3.5 py-2.5 text-[0.88rem] text-slate-700;
     }
 
     .club-plan-card__benefit--recommended {
-        @apply border-white/10 bg-white/10 text-slate-100;
+        @apply border-amber-200/90 bg-white/80 text-slate-700;
+    }
+
+    .panel-brand-soft {
+        @apply rounded-[1.7rem] border border-amber-100/90;
+        background:
+            radial-gradient(circle at top left, rgba(255, 239, 168, 0.48), transparent 30%),
+            radial-gradient(circle at bottom right, rgba(41, 88, 184, 0.12), transparent 28%),
+            linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 250, 237, 0.94));
+        box-shadow:
+            0 24px 56px -40px rgba(41, 88, 184, 0.12),
+            inset 0 1px 0 rgba(255, 255, 255, 0.88);
     }
 
     .media-slot-card {
-        @apply rounded-[2rem] border border-slate-200/85 bg-slate-50/70 p-5 sm:p-6;
+        @apply rounded-[1.7rem] border border-slate-200/85 bg-slate-50/70 p-4 sm:p-5;
         box-shadow:
             inset 0 1px 0 rgba(255, 255, 255, 0.78),
             0 18px 40px -34px rgba(15, 23, 42, 0.16);
@@ -1148,13 +1517,13 @@
     }
 
     .media-slot-preview {
-        @apply relative overflow-hidden rounded-[1.8rem] border border-slate-200/85 bg-white;
-        min-height: 17rem;
+        @apply relative overflow-hidden rounded-[1.5rem] border border-slate-200/85 bg-white;
+        min-height: 15rem;
         box-shadow: 0 22px 46px -34px rgba(15, 23, 42, 0.18);
     }
 
     .media-slot-preview--hero {
-        min-height: 22rem;
+        min-height: 19rem;
     }
 
     .media-slot-preview__image {
@@ -1162,19 +1531,19 @@
     }
 
     .media-slot-preview__placeholder {
-        @apply flex h-full min-h-[17rem] w-full items-end bg-slate-900 p-5 text-white;
+        @apply flex h-full min-h-[15rem] w-full items-end bg-slate-900 p-4 text-white;
         background:
-            radial-gradient(circle at top left, rgba(255, 255, 255, 0.16), transparent 26%),
-            radial-gradient(circle at bottom right, rgba(171, 141, 89, 0.24), transparent 28%),
-            linear-gradient(135deg, rgba(23, 53, 84, 0.96), rgba(15, 39, 64, 0.92));
+            radial-gradient(circle at top left, rgba(255, 255, 255, 0.24), transparent 26%),
+            radial-gradient(circle at bottom right, rgba(242, 207, 47, 0.3), transparent 28%),
+            linear-gradient(135deg, rgba(41, 88, 184, 0.94), rgba(78, 121, 204, 0.88));
     }
 
     .media-slot-preview__placeholder span {
-        @apply inline-flex rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-extrabold uppercase tracking-[0.2em] text-white/80 backdrop-blur-sm;
+        @apply inline-flex rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-[0.68rem] font-extrabold uppercase tracking-[0.18em] text-white/80 backdrop-blur-sm;
     }
 
     .media-slot-specs {
-        @apply grid gap-3 rounded-[1.6rem] border border-slate-200/85 bg-white/90 p-4 sm:grid-cols-2;
+        @apply grid gap-2.5 rounded-[1.35rem] border border-slate-200/85 bg-white/90 p-3.5 sm:grid-cols-2;
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
     }
 }
@@ -1184,47 +1553,219 @@
         @apply gap-2;
     }
 
-    .calendar-helper {
-        @apply max-w-[13rem];
-    }
-
-    .calendar-grid {
-        @apply gap-1.5;
-    }
-
     .calendar-day,
-    .calendar-day.is-other-month,
     .calendar-day-skeleton {
-        min-height: 4.2rem;
-        padding: 0.65rem;
-        border-radius: 1rem;
+        height: 2.2rem;
+        width: 2.2rem;
     }
 
     .calendar-day-number {
+        @apply text-[0.82rem];
+    }
+
+    .calendar-month-label {
         @apply text-base;
     }
 
-    .calendar-day-caption {
-        @apply mt-2 text-[0.6rem];
+    .membership-card-scene,
+    .membership-card-scene--public {
+        width: 100%;
     }
 
-    .slot-button-row {
-        @apply flex-col items-start;
+    .membership-card-flipper {
+        min-height: 21.5rem;
     }
 
     .membership-card-face {
         aspect-ratio: auto;
-        min-height: auto;
+        min-height: 21.5rem;
+        padding: 0.95rem;
     }
 
     .membership-card-front__body,
-    .membership-card-back__body {
+    .membership-card-back__body,
+    .membership-card-back__body--public {
         @apply grid-cols-1;
+    }
+
+    .membership-card-back__body--compact {
+        gap: 0.7rem;
+    }
+
+    .membership-card-back__content--compact {
+        gap: 0.65rem;
+    }
+
+    .membership-card-back__body--compact .membership-card-qr-shell {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .membership-card-validation-link--external {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .membership-card-photo {
+        justify-self: start;
+    }
+
+    .membership-card-name {
+        @apply text-[1.45rem];
+    }
+
+    .membership-card-number {
+        @apply text-[1.05rem];
     }
 
     .membership-card-qr-shell {
         min-width: 0;
         width: 100%;
+    }
+
+    .slot-grid {
+        @apply grid-cols-2;
+    }
+}
+
+@media (max-width: 430px) and (orientation: portrait) {
+    .membership-card-public-shell {
+        min-height: auto;
+        align-items: flex-start;
+        padding-top: max(0.75rem, env(safe-area-inset-top));
+        padding-right: 0.875rem;
+        padding-bottom: max(1rem, env(safe-area-inset-bottom));
+        padding-left: 0.875rem;
+    }
+
+    .membership-card-public-shell .membership-card-stack {
+        width: 100%;
+    }
+
+    .membership-card-scene--public {
+        width: 100%;
+    }
+
+    .membership-card-scene--public .membership-card-flipper {
+        min-height: 17.25rem;
+    }
+
+    .membership-card-scene--public .membership-card-face {
+        min-height: 17.25rem;
+        padding: 0.75rem;
+        border-radius: 1.3rem;
+    }
+
+    .membership-card-scene--public .membership-card-face__header {
+        gap: 0.5rem;
+    }
+
+    .membership-card-scene--public .membership-card-face__eyebrow {
+        letter-spacing: 0.18em;
+        font-size: 0.5rem;
+    }
+
+    .membership-card-scene--public .membership-card-brand {
+        margin-top: 0.2rem;
+        font-size: 0.76rem;
+    }
+
+    .membership-card-scene--public .membership-card-type {
+        padding: 0.28rem 0.6rem;
+        font-size: 0.46rem;
+    }
+
+    .membership-card-scene--public .membership-card-front__body {
+        grid-template-columns: minmax(0, 1fr) auto;
+        margin-top: 0.6rem;
+        gap: 0.55rem;
+    }
+
+    .membership-card-scene--public .membership-card-photo {
+        justify-self: end;
+        height: 3.75rem;
+        width: 3.2rem;
+        border-radius: 0.9rem;
+    }
+
+    .membership-card-scene--public .membership-card-photo__placeholder {
+        font-size: 1.5rem;
+    }
+
+    .membership-card-scene--public .membership-card-name {
+        margin-top: 0.3rem;
+        font-size: 1.05rem;
+        line-height: 0.98;
+    }
+
+    .membership-card-scene--public .membership-card-number {
+        margin-top: 0.35rem;
+        font-size: 0.82rem;
+        letter-spacing: 0.04em;
+    }
+
+    .membership-card-scene--public .membership-card-meta-grid,
+    .membership-card-scene--public .membership-card-back__meta {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        margin-top: 0.55rem;
+        gap: 0.36rem;
+    }
+
+    .membership-card-scene--public .membership-card-meta {
+        padding: 0.48rem 0.55rem;
+        border-radius: 0.75rem;
+    }
+
+    .membership-card-scene--public .membership-card-label {
+        font-size: 0.46rem;
+        letter-spacing: 0.14em;
+    }
+
+    .membership-card-scene--public .membership-card-value {
+        margin-top: 0.2rem;
+        font-size: 0.68rem;
+        line-height: 1.2;
+    }
+
+    .membership-card-scene--public .membership-card-front__footer {
+        margin-top: 0.55rem;
+        padding-top: 0.45rem;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.4rem;
+    }
+
+    .membership-card-scene--public .membership-card-status-badge,
+    .membership-card-scene--public .membership-card-flip-pill,
+    .membership-card-scene--public .membership-card-back__stamp {
+        padding: 0.28rem 0.55rem;
+        font-size: 0.44rem;
+    }
+
+    .membership-card-scene--public .membership-card-back__body {
+        margin-top: 0.55rem;
+        gap: 0.55rem;
+    }
+
+    .membership-card-scene--public .membership-card-back__body--public {
+        margin-top: 0.35rem;
+    }
+
+    .membership-card-scene--public .membership-card-back__content {
+        gap: 0.55rem;
+    }
+
+    .membership-card-scene--public .membership-card-instruction {
+        margin-top: 0.25rem;
+        font-size: 0.7rem;
+        line-height: 1.22;
+    }
+
+    .membership-card-scene--public + .membership-card-flip-hint,
+    .membership-card-scene--public .membership-card-flip-hint {
+        margin-top: 0.5rem;
+        font-size: 0.72rem;
     }
 }
 
@@ -1241,11 +1782,15 @@
 
 @media (max-width: 767px) {
     .app-shell {
-        @apply gap-0 px-3 py-3;
+        @apply gap-0 px-2.5 py-2.5;
+    }
+
+    .chart-shell.chart-shell-donut {
+        height: 15rem;
     }
 
     .sidebar-panel__inner {
-        @apply px-4 py-4;
+        @apply px-3.5 py-3.5;
     }
 
     .club-hero {
@@ -1258,11 +1803,11 @@
     }
 
     .club-gallery__item--featured {
-        min-height: 20rem;
+        min-height: 18rem;
     }
 
     .media-slot-preview,
     .media-slot-preview--hero {
-        min-height: 14rem;
+        min-height: 12.5rem;
     }
 }

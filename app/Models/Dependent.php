@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\DependentStatus;
+use App\Enums\ProposalOrigin;
 use Database\Factories\DependentFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -18,6 +19,7 @@ class Dependent extends Model
         'branch_id',
         'relationship',
         'status',
+        'source',
         'approved_at',
         'approved_by_user_id',
     ];
@@ -26,6 +28,7 @@ class Dependent extends Model
     {
         return [
             'status' => DependentStatus::class,
+            'source' => ProposalOrigin::class,
             'approved_at' => 'datetime',
         ];
     }

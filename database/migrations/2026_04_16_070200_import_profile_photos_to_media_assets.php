@@ -26,6 +26,11 @@ return new class extends Migration
                     $contents = Storage::disk('public')->get($user->profile_photo_path);
                     $absolutePath = Storage::disk('public')->path($user->profile_photo_path);
                     $imageSize = @getimagesize($absolutePath);
+                    $binaryStream = fopen($absolutePath, 'rb');
+
+                    if ($binaryStream === false) {
+                        continue;
+                    }
 
                     $assetId = DB::table('media_assets')->insertGetId([
                         'context' => 'profile_photo',
@@ -37,7 +42,7 @@ return new class extends Migration
                         'width' => $imageSize !== false ? $imageSize[0] : null,
                         'height' => $imageSize !== false ? $imageSize[1] : null,
                         'checksum' => hash('sha256', $contents),
-                        'content' => $contents,
+                        'content' => $binaryStream,
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);

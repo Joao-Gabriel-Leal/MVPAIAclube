@@ -6,6 +6,7 @@ use App\Http\Requests\SaveClubResourceRequest;
 use App\Models\Branch;
 use App\Models\ClubResource;
 use App\Models\Plan;
+use App\Support\ResourceTypeCatalog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -17,6 +18,7 @@ class ClubResourceController extends Controller
 
         $user = $request->user();
         $search = trim((string) $request->string('q'));
+        $typeFilter = trim((string) $request->string('type')) ?: null;
         $selectedBranchId = $user->isAdminBranch()
             ? $user->branch_id
             : ($request->filled('branch_id') ? $request->integer('branch_id') : null);
@@ -37,6 +39,12 @@ class ClubResourceController extends Controller
             });
         }
 
+        $typeOptionSnapshot = (clone $query)->get();
+
+        if ($typeFilter) {
+            $this->applyTypeFilter($query, $typeFilter);
+        }
+
         $resourceSnapshot = (clone $query)->get();
 
         return view('resources.index', [
@@ -50,6 +58,8 @@ class ClubResourceController extends Controller
                 : Branch::query()->active()->whereKey($user->branch_id)->orderBy('name')->get(),
             'selectedBranch' => $selectedBranchId ? Branch::query()->find($selectedBranchId) : null,
             'search' => $search,
+            'typeFilter' => $typeFilter,
+            'typeOptions' => ResourceTypeCatalog::options($typeOptionSnapshot),
             'summary' => [
                 'resources' => $resourceSnapshot->count(),
                 'active' => $resourceSnapshot->where('is_active', true)->count(),
@@ -65,6 +75,7 @@ class ClubResourceController extends Controller
                     'resources' => $group->count(),
                     'active' => $group->where('is_active', true)->count(),
                     'plans' => $group->sum(fn (ClubResource $resource) => $resource->plans->count()),
+                    'types' => ResourceTypeCatalog::options($group)->count(),
                 ])
                 ->values(),
         ]);
@@ -171,5 +182,23 @@ class ClubResourceController extends Controller
         if ($request->user()->isAdminBranch() && $request->integer('branch_id') !== $request->user()->branch_id) {
             abort(403);
         }
+    }
+
+    protected function applyTypeFilter($query, string $selectedType): void
+    {
+        if ($selectedType === 'outros') {
+            $query->where(function ($builder) {
+                $builder
+                    ->whereNull('type')
+                    ->orWhereRaw("TRIM(COALESCE(type, '')) = ''");
+            });
+
+            return;
+        }
+
+        $query->whereRaw(
+            "LOWER(TRIM(REPLACE(REPLACE(COALESCE(type, ''), '_', ' '), '-', ' '))) = ?",
+            [ResourceTypeCatalog::queryValue($selectedType)]
+        );
     }
 }

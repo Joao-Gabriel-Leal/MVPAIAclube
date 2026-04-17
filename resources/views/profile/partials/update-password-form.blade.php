@@ -1,13 +1,13 @@
 <section>
     <header>
         <div class="section-title">Seguranca</div>
-        <h2 class="mt-2 text-2xl font-semibold text-slate-950">Atualizar senha</h2>
-        <p class="mt-3 text-sm leading-7 text-slate-600">
+        <h2 class="mt-2 text-xl font-semibold text-slate-950">Atualizar senha</h2>
+        <p class="mt-3 text-[0.9rem] leading-6 text-slate-600">
             Use uma senha forte para manter sua conta protegida e alinhada com a operacao atual do sistema.
         </p>
     </header>
 
-    <form method="post" action="{{ route('password.update') }}" class="mt-6 space-y-6">
+    <form method="post" action="{{ route('password.update') }}" class="mt-5 space-y-5">
         @csrf
         @method('put')
 
@@ -29,7 +29,7 @@
             <x-input-error :messages="$errors->updatePassword->get('password_confirmation')" class="mt-2" />
         </div>
 
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-3">
             <x-primary-button>Salvar nova senha</x-primary-button>
 
             @if (session('status') === 'password-updated')

@@ -37,6 +37,19 @@ class MediaAsset extends Model
         return $this->visibility === self::VISIBILITY_PUBLIC;
     }
 
+    public function binaryContent(): string
+    {
+        $content = $this->getAttribute('content');
+
+        if (is_resource($content)) {
+            rewind($content);
+
+            return stream_get_contents($content) ?: '';
+        }
+
+        return (string) $content;
+    }
+
     public function url(): string
     {
         return route('media.show', $this);

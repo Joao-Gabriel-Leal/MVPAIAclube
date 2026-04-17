@@ -2,24 +2,41 @@
 
 namespace App\Services;
 
+use App\Enums\DependentStatus;
+use App\Enums\InventoryMovementType;
+use App\Enums\ProposalOrigin;
 use App\Models\Branch;
 use App\Models\ClubResource;
 use App\Models\Dependent;
+use App\Models\InventoryItem;
+use App\Models\InventoryMovement;
 use App\Models\Member;
 use App\Models\MembershipInvoice;
 use App\Models\Reservation;
 use App\Models\User;
+use App\Support\AdminMetricCards;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 
 class ReportService
 {
+    protected const BRAND_BLUE = '#2958B8';
+
+    protected const BRAND_BLUE_SOFT = '#4E79CC';
+
+    protected const BRAND_YELLOW = '#F2CF2F';
+
+    protected const BRAND_YELLOW_DEEP = '#D4A919';
+
     public function generate(User $user, array $filters = []): array
     {
         $branchId = $user->isAdminBranch() ? $user->branch_id : ($filters['branch_id'] ?? null);
         $start = $filters['start_date'] ?? now()->startOfMonth()->toDateString();
         $end = $filters['end_date'] ?? now()->endOfMonth()->toDateString();
         $status = $filters['status'] ?? null;
+        $proposalOrigin = $filters['proposal_origin'] ?? null;
+        $inventoryCategory = $filters['inventory_category'] ?? null;
+        $selectedBranch = $branchId ? Branch::query()->find($branchId) : null;
 
         $branches = $user->isAdminMatrix()
             ? Branch::query()->active()->orderBy('name')->get()
@@ -52,6 +69,37 @@ class ReportService
         $resources = ClubResource::query()
             ->with('branch')
             ->when($branchId, fn (Builder $query) => $query->where('branch_id', $branchId))
+            ->get();
+
+        $pendingMembers = Member::query()
+            ->with(['user', 'primaryBranch', 'plan'])
+            ->where('status', \App\Enums\MembershipStatus::Pending)
+            ->when($branchId, fn (Builder $query) => $query->where('primary_branch_id', $branchId))
+            ->when($proposalOrigin, fn (Builder $query, $selectedOrigin) => $query->where('source', $selectedOrigin))
+            ->get();
+
+        $pendingDependents = Dependent::query()
+            ->with(['member.user', 'user', 'branch'])
+            ->where('status', DependentStatus::Pending)
+            ->when($branchId, fn (Builder $query) => $query->where('branch_id', $branchId))
+            ->when(
+                $proposalOrigin === ProposalOrigin::Public->value,
+                fn (Builder $query) => $query->whereRaw('1 = 0'),
+                fn (Builder $query) => $query->when($proposalOrigin, fn (Builder $dependentQuery, $selectedOrigin) => $dependentQuery->where('source', $selectedOrigin))
+            )
+            ->get();
+
+        $inventoryItems = InventoryItem::query()
+            ->with(['branch', 'resource'])
+            ->when($branchId, fn (Builder $query) => $query->where('branch_id', $branchId))
+            ->when($inventoryCategory, fn (Builder $query, $selectedCategory) => $query->where('category', $selectedCategory))
+            ->get();
+
+        $inventoryMovements = InventoryMovement::query()
+            ->with(['item', 'branch', 'resource', 'reservation'])
+            ->when($branchId, fn (Builder $query) => $query->where('branch_id', $branchId))
+            ->when($inventoryCategory, fn (Builder $query, $selectedCategory) => $query->whereHas('item', fn (Builder $itemQuery) => $itemQuery->where('category', $selectedCategory)))
+            ->whereBetween('occurred_at', [$start.' 00:00:00', $end.' 23:59:59'])
             ->get();
 
         $membersByBranch = $members
@@ -100,15 +148,85 @@ class ReportService
             ->sortDesc()
             ->take(8);
 
+        $proposalTypes = collect([
+            'Associados' => $pendingMembers->count(),
+            'Dependentes' => $pendingDependents->count(),
+        ]);
+
+        $proposalOrigins = collect([
+            ProposalOrigin::Manual->label() => $pendingMembers->where('source', ProposalOrigin::Manual)->count() + $pendingDependents->where('source', ProposalOrigin::Manual)->count(),
+            ProposalOrigin::Public->label() => $pendingMembers->where('source', ProposalOrigin::Public)->count(),
+        ]);
+
+        $lowStockItems = $inventoryItems
+            ->filter(fn (InventoryItem $item) => $item->is_low_stock)
+            ->sortBy('current_quantity')
+            ->values();
+
+        $consumptionMovements = $inventoryMovements
+            ->filter(fn (InventoryMovement $movement) => $movement->movement_type === InventoryMovementType::Exit);
+
+        $consumptionByCategory = $consumptionMovements
+            ->groupBy(fn (InventoryMovement $movement) => $movement->item?->category ?? 'Sem categoria')
+            ->map(fn ($group) => (float) round($group->sum(fn (InventoryMovement $movement) => abs((float) $movement->quantity)), 2))
+            ->sortDesc();
+
+        $consumptionByItem = $consumptionMovements
+            ->groupBy(fn (InventoryMovement $movement) => $movement->item?->name ?? 'Item removido')
+            ->map(fn ($group) => (float) round($group->sum(fn (InventoryMovement $movement) => abs((float) $movement->quantity)), 2))
+            ->sortDesc()
+            ->take(8);
+
         return [
             'filters' => [
                 'branch_id' => $branchId,
                 'start_date' => $start,
                 'end_date' => $end,
                 'status' => $status,
+                'proposal_origin' => $proposalOrigin,
+                'inventory_category' => $inventoryCategory,
             ],
             'branches' => $branches,
-            'selectedBranch' => $branchId ? Branch::query()->find($branchId) : null,
+            'selectedBranch' => $selectedBranch,
+            'inventoryCategories' => InventoryItem::query()
+                ->when($branchId, fn (Builder $query) => $query->where('branch_id', $branchId))
+                ->select('category')
+                ->distinct()
+                ->orderBy('category')
+                ->pluck('category'),
+            'summaryCards' => [
+                'members' => AdminMetricCards::count(
+                    'Associados',
+                    $members->count(),
+                    AdminMetricCards::dateRangeContext($start, $end, $selectedBranch)
+                ),
+                'dependents' => AdminMetricCards::count(
+                    'Dependentes',
+                    $dependents->count(),
+                    AdminMetricCards::dateRangeContext($start, $end, $selectedBranch)
+                ),
+                'reservations' => AdminMetricCards::count(
+                    'Reservas',
+                    $reservations->count(),
+                    AdminMetricCards::dateRangeContext($start, $end, $selectedBranch)
+                ),
+                'revenue' => AdminMetricCards::currency(
+                    'Mensalidades previstas no periodo',
+                    (float) $invoices->sum('amount'),
+                    AdminMetricCards::dateRangeContext($start, $end, $selectedBranch),
+                    AdminMetricCards::detailCount($invoices->count(), 'mensalidade')
+                ),
+                'pendingProposals' => AdminMetricCards::count(
+                    'Propostas pendentes',
+                    $pendingMembers->count() + $pendingDependents->count(),
+                    AdminMetricCards::scopeContext('Fila atual', $selectedBranch)
+                ),
+                'inventoryAlerts' => AdminMetricCards::count(
+                    'Alertas de estoque',
+                    $lowStockItems->count(),
+                    AdminMetricCards::scopeContext('Estoque atual', $selectedBranch)
+                ),
+            ],
             'summary' => [
                 'members' => $members->count(),
                 'dependents' => $dependents->count(),
@@ -116,6 +234,10 @@ class ReportService
                 'resources' => $resources->count(),
                 'revenue' => (float) $invoices->sum('amount'),
                 'averageTicket' => (float) round($invoices->avg('amount') ?? 0, 2),
+                'pendingProposals' => $pendingMembers->count() + $pendingDependents->count(),
+                'inventoryItems' => $inventoryItems->count(),
+                'inventoryAlerts' => $lowStockItems->count(),
+                'reservationLinkedConsumption' => (float) round($consumptionMovements->whereNotNull('reservation_id')->sum(fn (InventoryMovement $movement) => abs((float) $movement->quantity)), 2),
             ],
             'membersByBranch' => $membersByBranch,
             'membersByStatus' => $membersByStatus,
@@ -125,43 +247,74 @@ class ReportService
             'reservationTrend' => $reservationTrend,
             'dependentsByPlan' => $dependentsByPlan,
             'dependentsByHolder' => $dependentsByHolder,
+            'proposalTypes' => $proposalTypes,
+            'proposalOrigins' => $proposalOrigins,
+            'lowStockItems' => $lowStockItems,
+            'inventoryConsumptionByCategory' => $consumptionByCategory,
+            'inventoryConsumptionByItem' => $consumptionByItem,
             'charts' => [
                 'membersByBranch' => $this->barChart(
                     'Associados',
                     $membersByBranch->keys()->values()->all(),
                     $membersByBranch->values()->all(),
-                    'rgba(124, 58, 237, 0.82)',
-                    'rgba(109, 40, 217, 1)'
+                    $this->hexToRgba(self::BRAND_BLUE, 0.82),
+                    self::BRAND_BLUE
                 ),
                 'membersByStatus' => $this->doughnutChart(
                     $membersByStatus->keys()->values()->all(),
                     $membersByStatus->values()->all(),
-                    ['#7c3aed', '#ec4899', '#f59e0b', '#10b981']
+                    [self::BRAND_BLUE, self::BRAND_YELLOW, '#F59E0B', '#94A3B8']
                 ),
                 'invoicesByStatus' => $this->doughnutChart(
                     $invoicesByStatus->keys()->values()->all(),
                     $invoicesByStatus->pluck('count')->values()->all(),
-                    ['#14b8a6', '#f97316', '#e11d48', '#6366f1']
+                    [self::BRAND_BLUE, self::BRAND_YELLOW, '#10B981', '#F59E0B']
                 ),
                 'resourceUsage' => $this->barChart(
                     'Reservas',
                     $resourceUsage->keys()->values()->all(),
                     $resourceUsage->values()->all(),
-                    'rgba(16, 185, 129, 0.8)',
-                    'rgba(5, 150, 105, 1)'
+                    $this->hexToRgba(self::BRAND_YELLOW, 0.82),
+                    self::BRAND_YELLOW_DEEP
                 ),
                 'reservationTrend' => $this->lineChart(
                     'Reservas por dia',
                     $reservationTrend->keys()->values()->all(),
                     $reservationTrend->values()->all(),
-                    '#7c3aed'
+                    self::BRAND_BLUE
                 ),
                 'reservationsByBranch' => $this->barChart(
                     'Reservas',
                     $reservationsByBranch->keys()->values()->all(),
                     $reservationsByBranch->values()->all(),
-                    'rgba(59, 130, 246, 0.78)',
-                    'rgba(37, 99, 235, 1)'
+                    $this->hexToRgba(self::BRAND_BLUE_SOFT, 0.78),
+                    self::BRAND_BLUE_SOFT
+                ),
+                'proposalTypes' => $this->barChart(
+                    'Propostas',
+                    $proposalTypes->keys()->values()->all(),
+                    $proposalTypes->values()->all(),
+                    $this->hexToRgba(self::BRAND_BLUE_SOFT, 0.76),
+                    self::BRAND_BLUE_SOFT
+                ),
+                'proposalOrigins' => $this->doughnutChart(
+                    $proposalOrigins->keys()->values()->all(),
+                    $proposalOrigins->values()->all(),
+                    [self::BRAND_BLUE, self::BRAND_YELLOW]
+                ),
+                'inventoryConsumptionByCategory' => $this->barChart(
+                    'Saidas',
+                    $consumptionByCategory->keys()->values()->all(),
+                    $consumptionByCategory->values()->all(),
+                    $this->hexToRgba(self::BRAND_YELLOW, 0.82),
+                    self::BRAND_YELLOW_DEEP
+                ),
+                'inventoryConsumptionByItem' => $this->barChart(
+                    'Saidas',
+                    $consumptionByItem->keys()->values()->all(),
+                    $consumptionByItem->values()->all(),
+                    $this->hexToRgba(self::BRAND_BLUE, 0.82),
+                    self::BRAND_BLUE
                 ),
             ],
         ];
@@ -180,6 +333,7 @@ class ReportService
                     'borderColor' => $borderColor,
                     'borderWidth' => 1,
                     'borderRadius' => 10,
+                    'maxBarThickness' => 34,
                 ]],
             ],
             'options' => [
@@ -209,7 +363,7 @@ class ReportService
                     'data' => $data,
                     'backgroundColor' => $colors,
                     'borderWidth' => 0,
-                    'hoverOffset' => 8,
+                    'hoverOffset' => 4,
                 ]],
             ],
             'options' => [
@@ -218,7 +372,7 @@ class ReportService
                         'position' => 'bottom',
                     ],
                 ],
-                'cutout' => '62%',
+                'cutout' => '74%',
             ],
         ];
     }
@@ -233,11 +387,11 @@ class ReportService
                     'label' => $label,
                     'data' => $data,
                     'borderColor' => $borderColor,
-                    'backgroundColor' => 'rgba(124, 58, 237, 0.15)',
-                    'tension' => 0.35,
+                    'backgroundColor' => $this->hexToRgba($borderColor, 0.14),
+                    'tension' => 0.32,
                     'fill' => true,
-                    'pointRadius' => 3,
-                    'pointHoverRadius' => 5,
+                    'pointRadius' => 2.5,
+                    'pointHoverRadius' => 4,
                 ]],
             ],
             'options' => [
@@ -255,5 +409,20 @@ class ReportService
                 ],
             ],
         ];
+    }
+
+    protected function hexToRgba(string $hex, float $alpha): string
+    {
+        $normalized = ltrim($hex, '#');
+
+        if (strlen($normalized) !== 6) {
+            return "rgba(41, 88, 184, {$alpha})";
+        }
+
+        $red = hexdec(substr($normalized, 0, 2));
+        $green = hexdec(substr($normalized, 2, 2));
+        $blue = hexdec(substr($normalized, 4, 2));
+
+        return "rgba({$red}, {$green}, {$blue}, {$alpha})";
     }
 }

@@ -37,7 +37,11 @@ class ProfileController extends Controller
     public function update(ProfileUpdateRequest $request, MediaAssetService $mediaAssetService): RedirectResponse
     {
         $user = $request->user();
-        $user->fill($request->safe()->only(['name', 'email']));
+        $allowedAttributes = $user->isCardHolder()
+            ? ['email', 'phone']
+            : ['name', 'email'];
+
+        $user->fill($request->safe()->only($allowedAttributes));
 
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
@@ -58,6 +62,8 @@ class ProfileController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        abort_if($request->user()->isCardHolder(), 403);
+
         $request->validateWithBag('userDeletion', [
             'password' => ['required', 'current_password'],
         ]);

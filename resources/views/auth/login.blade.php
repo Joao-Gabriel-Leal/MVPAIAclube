@@ -1,15 +1,15 @@
 <x-guest-layout>
-    <div class="mb-8">
+    @php($clubSetting = \App\Models\ClubSetting::current())
+
+    <div class="mb-6">
         <div class="section-title">Portal de acesso</div>
-        <h1 class="mt-3 text-3xl font-semibold tracking-tight text-slate-950">Entrar no ClubeAIA</h1>
-        <p class="mt-3 text-sm leading-7 text-slate-600">
-            Use seu e-mail e senha para acessar a rotina da administracao, dos associados e dos dependentes.
-        </p>
+        <h1 class="mt-2.5 text-[1.75rem] font-semibold tracking-tight text-slate-950 sm:text-[1.85rem]">{{ $clubSetting->resolvedLoginTitle() }}</h1>
+        <p class="lead-text mt-3">{{ $clubSetting->resolvedLoginSubtitle() }}</p>
     </div>
 
-    <x-auth-session-status class="mb-5" :status="session('status')" />
+    <x-auth-session-status class="mb-4" :status="session('status')" />
 
-    <form method="POST" action="{{ route('login') }}" class="space-y-5">
+    <form method="POST" action="{{ route('login') }}" class="space-y-[1.125rem]">
         @csrf
 
         <div>
@@ -24,24 +24,23 @@
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
-        <label class="inline-flex items-center gap-3 text-sm font-medium text-slate-600">
+        <label class="inline-flex items-center gap-2.5 text-[0.88rem] font-medium text-slate-600">
             <input id="remember_me" type="checkbox" class="rounded border-slate-300 text-slate-900 focus:ring-slate-300" name="remember">
             Manter conectado
         </label>
 
         <div class="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
-            <a href="{{ route('home') }}" class="inline-link">Voltar para a pagina inicial</a>
+            <a href="{{ route('home') }}" class="btn-secondary">Voltar para a pagina inicial</a>
             <button class="btn-primary" type="submit">Entrar</button>
         </div>
     </form>
 
     @if (app()->environment('local'))
-        <div class="panel-muted mt-8 p-4 text-sm text-slate-600">
-            <div class="font-semibold text-slate-900">Acesso de teste no ambiente local</div>
-            <p class="mt-2 leading-6">Administracao, associados e dependentes continuam usando o mesmo login do ambiente de desenvolvimento.</p>
-            <div class="mt-3 space-y-1.5 text-xs leading-6 text-slate-500">
+        <div class="panel-muted auth-access-card mt-6 p-3.5 text-[0.88rem] text-slate-600">
+            <div class="font-semibold text-slate-900">Acessos locais</div>
+            <div class="mt-2.5 space-y-1 text-[0.68rem] leading-5 text-slate-500">
                 <p>Admin Matriz: admin.matriz@clube.test / password</p>
-                <p>Admin Filial: admin.zonasul@clube.test / password</p>
+                <p>Admin Filial: admin.brasilia@clube.test / password</p>
                 <p>Associado: associado@clube.test / password</p>
                 <p>Dependente: dependente@clube.test / password</p>
             </div>

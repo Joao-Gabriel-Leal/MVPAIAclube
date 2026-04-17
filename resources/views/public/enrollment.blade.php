@@ -3,47 +3,98 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Adesao {{ $branch->name }}</title>
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=manrope:400,500,600,700,800|fraunces:500,600,700" rel="stylesheet" />
+        <title>{{ $clubSetting->resolvedBrandName() }} - Adesao {{ $branch->name }}</title>
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <style>:root { {{ $clubSetting->themeCssVariablesInline() }} }</style>
     </head>
     <body>
-        <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-            <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <x-application-logo />
-                <a href="{{ route('home') }}" class="btn-secondary">Voltar</a>
-            </div>
-
-            <div class="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
-                <div class="panel-dark overflow-hidden">
-                    <div class="relative h-full p-8 sm:p-10">
-                        <div class="section-title text-slate-300">Solicitacao de adesao</div>
-                        <h1 class="mt-4 text-4xl font-semibold tracking-tight text-white">{{ $branch->name }}</h1>
-                        <p class="mt-4 text-sm leading-7 text-slate-200/80">
-                            Seu pedido sera enviado para avaliacao da administracao da unidade, mantendo um primeiro contato mais claro e institucional.
-                        </p>
-
-                        <div class="mt-8 space-y-4">
-                            <div class="rounded-[1.7rem] border border-white/10 bg-white/10 p-5 text-sm text-slate-100/90">
-                                <div class="text-xs font-extrabold uppercase tracking-[0.28em] text-slate-300">Endereco</div>
-                                <p class="mt-3 leading-7">{{ $branch->address }}</p>
+        <div class="enrollment-shell">
+            <div class="grid w-full gap-4 lg:grid-cols-[0.96fr_1.04fr]">
+                <section class="panel-dark auth-hero-panel overflow-hidden">
+                    <div class="relative h-full p-6 sm:p-7">
+                        <div class="relative z-10 flex h-full flex-col">
+                            <div class="flex items-start justify-between gap-4">
+                                <x-application-logo theme="dark" />
+                                <a href="{{ route('home') }}" class="btn-secondary border-white/25 bg-white/10 text-white hover:border-white/35 hover:bg-white/15">Voltar</a>
                             </div>
 
-                            <div class="rounded-[1.7rem] border border-white/10 bg-white/10 p-5 text-sm text-slate-100/90">
-                                <div class="text-xs font-extrabold uppercase tracking-[0.28em] text-slate-300">Mensalidade base</div>
-                                <p class="mt-3 text-2xl font-bold text-white">R$ {{ number_format((float) $branch->monthly_fee_default, 2, ',', '.') }}</p>
+                            <div class="mt-8">
+                                <div class="section-title !text-white/70">Solicitacao de adesao</div>
+                                <h1 class="mt-3 text-[2rem] font-semibold tracking-tight text-white sm:text-[2.3rem]">{{ $branch->name }}</h1>
+                                <p class="mt-3 max-w-xl text-[0.96rem] leading-7 text-white/82">
+                                    {{ $clubSetting->resolvedEnrollmentIntro() }}
+                                </p>
+                            </div>
+
+                            <div class="mt-6 grid gap-4 sm:grid-cols-2">
+                                <div class="rounded-[1.45rem] border border-white/16 bg-white/10 p-4 backdrop-blur-sm">
+                                    <div class="section-title !text-white/70">Endereco</div>
+                                    <p class="mt-2.5 text-sm leading-6 text-white/92">{{ $branch->address ?: 'Endereco nao informado.' }}</p>
+                                </div>
+
+                                <div class="rounded-[1.45rem] border border-white/16 bg-white/10 p-4 backdrop-blur-sm">
+                                    <div class="section-title !text-white/70">Mensalidade base</div>
+                                    <p class="mt-2.5 text-[1.75rem] font-bold text-white">R$ {{ number_format((float) $branch->monthly_fee_default, 2, ',', '.') }}</p>
+                                </div>
+
+                                @if ($branch->publicSummary() !== '')
+                                    <div class="rounded-[1.45rem] border border-white/16 bg-white/10 p-4 backdrop-blur-sm sm:col-span-2">
+                                        <div class="section-title !text-white/70">Resumo da unidade</div>
+                                        <p class="mt-2.5 text-sm leading-6 text-white/92">{{ $branch->publicSummary() }}</p>
+                                    </div>
+                                @endif
+
+                                @if ($branch->publicPhone() || $branch->publicWhatsapp() || $branch->publicHours() || $branch->email)
+                                    <div class="rounded-[1.45rem] border border-white/16 bg-white/10 p-4 backdrop-blur-sm sm:col-span-2">
+                                        <div class="section-title !text-white/70">Contato da unidade</div>
+                                        <div class="mt-3 flex flex-wrap gap-2">
+                                            @if ($branch->publicPhone())
+                                                <a href="{{ $branch->publicPhoneLink() }}" class="chip-brand">{{ $branch->publicPhone() }}</a>
+                                            @endif
+                                            @if ($branch->publicWhatsapp())
+                                                <a href="{{ $branch->publicWhatsappLink() }}" class="chip-info" target="_blank" rel="noreferrer">WhatsApp {{ $branch->publicWhatsapp() }}</a>
+                                            @endif
+                                            @if ($branch->publicHours())
+                                                <span class="chip-info">{{ $branch->publicHours() }}</span>
+                                            @endif
+                                            @if ($branch->email)
+                                                <a href="mailto:{{ $branch->email }}" class="chip-info">{{ $branch->email }}</a>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+
+                            <div class="enrollment-steps">
+                                <div class="enrollment-step">
+                                    <strong class="font-semibold text-white">1.</strong> Voce envia seus dados e escolhe o plano ideal para a unidade.
+                                </div>
+                                <div class="enrollment-step">
+                                    <strong class="font-semibold text-white">2.</strong> A solicitacao vai para <span class="font-semibold text-white">Propostas</span>, sem entrar direto em Associados.
+                                </div>
+                                <div class="enrollment-step">
+                                    <strong class="font-semibold text-white">3.</strong> A filial aprova ou reprova o cadastro antes da liberacao final.
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </section>
 
-                <div class="panel p-8">
-                    <div class="section-title">Formulario</div>
-                    <h2 class="mt-2 text-3xl font-semibold tracking-tight text-slate-950">Criar conta de associado</h2>
-                    <p class="lead-text mt-3">Preencha os dados principais e escolha um plano para enviar sua solicitacao de adesao.</p>
+                <section class="panel px-5 py-6 sm:px-6 sm:py-7">
+                    <div class="flex flex-col gap-4 border-b border-slate-200/80 pb-5 sm:flex-row sm:items-start sm:justify-between">
+                        <div>
+                            <div class="section-title">Formulario</div>
+                            <h2 class="mt-2 text-[1.7rem] font-semibold tracking-tight text-slate-950">Criar conta de associado</h2>
+                            <p class="lead-text mt-3">Preencha os dados principais e escolha um plano para enviar sua solicitacao de adesao.</p>
+                        </div>
 
-                    <form method="POST" action="{{ route('enrollment.store', $branch) }}" class="mt-8 space-y-5">
+                        <div class="rounded-[1.1rem] border border-amber-100/80 bg-amber-50/80 px-4 py-3 text-sm text-slate-700">
+                            <div class="font-semibold text-slate-900">Destino do cadastro</div>
+                            <div class="mt-1">Fila de propostas da filial</div>
+                        </div>
+                    </div>
+
+                    <form method="POST" action="{{ route('enrollment.store', $branch) }}" class="mt-6 space-y-[1.125rem]">
                         @csrf
 
                         <div>
@@ -56,7 +107,7 @@
                             <x-input-error :messages="$errors->get('plan_id')" class="mt-2" />
                         </div>
 
-                        <div class="grid gap-5 sm:grid-cols-2">
+                        <div class="grid gap-4 sm:grid-cols-2">
                             <div class="sm:col-span-2">
                                 <label class="field-label" for="name">Nome completo</label>
                                 <input class="field-input" id="name" name="name" value="{{ old('name') }}" required />
@@ -99,9 +150,13 @@
                             </div>
                         </div>
 
+                        <div class="rounded-[1.25rem] border border-slate-200 bg-slate-50/80 px-4 py-3 text-sm leading-6 text-slate-600">
+                            {{ $clubSetting->resolvedEnrollmentNotice() }}
+                        </div>
+
                         <button class="btn-primary w-full" type="submit">Enviar adesao</button>
                     </form>
-                </div>
+                </section>
             </div>
         </div>
     </body>

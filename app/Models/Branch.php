@@ -8,6 +8,7 @@ use Database\Factories\BranchFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Branch extends Model
 {
@@ -74,8 +75,79 @@ class Branch extends Model
         return $this->hasMany(MembershipInvoice::class);
     }
 
+    public function inventoryItems()
+    {
+        return $this->hasMany(InventoryItem::class);
+    }
+
+    public function inventoryMovements()
+    {
+        return $this->hasMany(InventoryMovement::class);
+    }
+
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+
+    public function publicCity(): string
+    {
+        $city = trim((string) $this->settingValue('city'));
+
+        if ($city !== '') {
+            return $city;
+        }
+
+        $fallback = trim((string) Str::afterLast($this->name, 'AABB '));
+
+        return $fallback !== '' ? $fallback : $this->name;
+    }
+
+    public function publicSummary(): string
+    {
+        return trim((string) $this->settingValue('summary'));
+    }
+
+    public function publicPhone(): ?string
+    {
+        $phone = MaskFormatter::phone((string) $this->settingValue('public_phone'));
+
+        return $phone ?: $this->phone;
+    }
+
+    public function publicPhoneLink(): ?string
+    {
+        $digits = MaskFormatter::digits((string) $this->settingValue('public_phone'))
+            ?: MaskFormatter::digits($this->getRawOriginal('phone'));
+
+        return $digits ? 'tel:'.$digits : null;
+    }
+
+    public function publicWhatsapp(): ?string
+    {
+        return MaskFormatter::phone((string) $this->settingValue('public_whatsapp'));
+    }
+
+    public function publicWhatsappLink(): ?string
+    {
+        $digits = MaskFormatter::digits((string) $this->settingValue('public_whatsapp'));
+
+        if (! $digits) {
+            return null;
+        }
+
+        return 'https://wa.me/'.(Str::startsWith($digits, '55') ? $digits : '55'.$digits);
+    }
+
+    public function publicHours(): ?string
+    {
+        $hours = trim((string) $this->settingValue('public_hours'));
+
+        return $hours !== '' ? $hours : null;
+    }
+
+    protected function settingValue(string $key): mixed
+    {
+        return data_get($this->settings ?? [], $key);
     }
 }

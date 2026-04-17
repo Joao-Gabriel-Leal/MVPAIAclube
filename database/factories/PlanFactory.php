@@ -14,7 +14,7 @@ class PlanFactory extends Factory
 {
     public function definition(): array
     {
-        $name = fake()->unique()->randomElement(['Bronze', 'Prata', 'Ouro', 'Elite']);
+        $name = fake()->unique()->randomElement(['Associado Individual', 'Associado Familia', 'Associado Comunidade', 'Associado Premium']);
 
         return [
             'name' => $name,

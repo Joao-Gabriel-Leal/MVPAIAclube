@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
             PlanSeeder::class,
             ClubDemoSeeder::class,
             MembershipInvoiceSeeder::class,
+            AabbPresentationSeeder::class,
         ]);
     }
 }
